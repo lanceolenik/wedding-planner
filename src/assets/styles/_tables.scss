@@ -1,0 +1,110 @@
+/* _tables.scss */
+
+.table-wrapper {
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  @media (prefers-color-scheme: dark) {
+    background: #1a1a1a;
+  }
+}
+
+tr {
+  margin-bottom: 1.5rem;
+  padding: 0.5rem;
+  border: 2px solid var(--vt-c-green);
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+th {
+  background: var(--vt-c-green);
+  color: white;
+  font-weight: bold;
+  @media (prefers-color-scheme: dark) {
+    background: var(--vt-c-green-dark);
+    color: var(--color-heading);
+  }
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+  @media (prefers-color-scheme: dark) {
+    background: #2a2a2a;
+  }
+}
+
+tr:hover {
+  background: #f1f1f1;
+  @media (prefers-color-scheme: dark) {
+    background: #333;
+  }
+}
+
+@media (max-width: 767px) {
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    border: 1px solid var(--vt-c-green);
+    margin-bottom: 1rem;
+  }
+
+  td {
+    position: relative;
+    padding: 0.5rem 0 0.5rem 150px;
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid #eee;
+    @media (prefers-color-scheme: dark) {
+      border-bottom: 1px solid #444;
+    }
+  }
+
+  td:last-child {
+    border-bottom: 0;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    top: 0.5rem;
+    font-weight: bold;
+    font-size: 0.8em;
+    color: var(--color-heading);
+    white-space: nowrap;
+  }
+
+  td[data-label='Edit']::before,
+  td[data-label='Delete']::before {
+    content: none;
+  }
+
+  td[data-label='Edit'],
+  td[data-label='Delete'] {
+    padding: 0.5rem;
+  }
+}

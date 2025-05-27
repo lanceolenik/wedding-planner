@@ -1,0 +1,24 @@
+@use './fonts' as *;
+@use './variables' as *;
+@use './tags' as *;
+@use './tables' as *;
+@use './forms' as *;
+@use './utilities' as *;
+
+#app {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+#app > * {
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  #app {
+    padding-top: 0;
+  }
+}

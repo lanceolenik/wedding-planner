@@ -1,0 +1,196 @@
+/* _utilities.scss */
+
+* {
+  box-sizing: border-box;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: calc(100% - 40px);
+  max-width: 1024px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+}
+.shadowed {
+  padding: 20px;
+  background: var(--color-background-opaque);
+  border-radius: 20px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+.shadowed.--notransparency {
+  background: var(--color-background);
+}
+a.has-icon {
+  text-decoration: none;
+  color: var(--vt-c-green);
+  opacity: 1;
+  font-size: 25px;
+  &:hover {
+    color: var(--vt-c-green-dark);
+  }
+}
+.center {
+  text-align: center;
+}
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: 5px;
+  color: var(--vt-c-white-soft);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+  border: 3px solid var(--vt-c-white-soft);
+  border-radius: 10px;
+}
+.success.toast {
+  background-color: var(--vt-c-green-dark);
+}
+.error.toast {
+  background-color: var(--vt-c-red);
+}
+.error {
+  color: var(--vt-c-red);
+  font-size: 0.9em;
+  margin: 5px 0 0;
+}
+
+.--green {
+  font-weight: bold;
+  color: var(--vt-c-green-bright);
+}
+.--red {
+  font-weight: bold;
+  color: var(--vt-c-red);
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.tippy-box[data-theme~='translucent'] {
+  background: var(--vt-c-green-dark) !important;
+}
+
+/* Printer-friendly styles matching mobile table layout */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .container,
+  .shadowed {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  .header,
+  .print,
+  .logout-button,
+  .toggle-button,
+  h4,
+  .error-message,
+  nav,
+  footer,
+  #__vue-devtools-container__,
+  .table-wrapper,
+  .has-icon {
+    display: none !important; /* Hide non-essential elements */
+  }
+  .table-wrapper {
+    margin-bottom: 1rem;
+  }
+  /* Show only the active table */
+  body[data-printing-active='rsvp'] .table-wrapper[data-printing='rsvp'],
+  body[data-printing-active='help'] .table-wrapper[data-printing='help'],
+  body[data-printing-active='contact'] .table-wrapper[data-printing='contact'],
+  body[data-printing-active='invites'] .table-wrapper[data-printing='invites'] {
+    display: block !important;
+    page-break-after: auto !important; /* Prevent extra blank pages */
+  }
+  /* Mobile-like table styling for print */
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+  thead {
+    display: none; /* Hide table header */
+  }
+  tbody {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  tr {
+    width: 50%;
+    margin-bottom: 0;
+    padding: 0.5rem;
+    border: 1px solid black; /* Use black instead of var(--vt-c-green) for print */
+    &:nth-child(even) {
+      border-left: 0;
+    }
+  }
+  td {
+    position: relative;
+    padding: 0 0 0 120px; /* Adjusted for print readability */
+    text-align: left;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 10pt;
+    color: black !important;
+  }
+  td:last-child {
+    border-bottom: 0;
+  }
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0.5rem;
+    top: 0.2em;
+    font-weight: bold;
+    font-size: 9pt;
+    color: black !important;
+    white-space: nowrap;
+  }
+  td[data-label='Message'] .message-content {
+    white-space: normal !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  /* Remove hover and alternating row effects */
+  tr:nth-child(even),
+  tr:hover {
+    background: transparent !important;
+  }
+  /* Remove link underlines */
+  a.email-link,
+  a.phone-link {
+    text-decoration: none !important;
+    color: black !important;
+  }
+  /* Ensure no background images or colors */
+  * {
+    background: transparent !important;
+    color: black !important;
+  }
+}

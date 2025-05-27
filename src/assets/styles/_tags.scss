@@ -1,0 +1,106 @@
+/* _tags.scss */
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  transition: color 0.5s;
+  line-height: 1.6;
+  color: var(--vt-c-green);
+  font-family: var(--font-primary);
+  text-wrap: balance;
+  font-size: clamp(15px, 4.5vw, 18px);
+  letter-spacing: -0.5px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3 {
+  position: relative;
+  color: var(--color-heading);
+  font-weight: 500;
+  margin: 0;
+}
+h2,
+h3 {
+  font-family: var(--font-secondary-heading);
+}
+h1 {
+  font-family: var(--font-primary-heading);
+  font-size: max(50px, 5vw);
+  width: 100%;
+  text-align: center;
+  &.hasHr {
+    margin-bottom: 30px;
+    &:before,
+    &:after {
+      content: '';
+    }
+    &:before {
+      position: absolute;
+      border-bottom: 2px solid var(--color-heading);
+      width: 50%;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 1px;
+      bottom: 15px;
+      z-index: 0;
+    }
+    &:after {
+      position: relative;
+      background: url(@/assets/roses.webp);
+      background-size: contain;
+      background-position: center center;
+      background-repeat: no-repeat;
+      display: block;
+      width: 100%;
+      height: 50px;
+      z-index: 1;
+    }
+    @media (max-width: 767px) {
+      margin-top: 30px;
+    }
+  }
+}
+h2 {
+  font-size: max(40px, 4vw);
+}
+h3,
+h2.likeh3 {
+  font-size: max(35px, 2.8vw);
+}
+p,
+li,
+label {
+  color: var(--color-text);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+a,
+a:link,
+a:visited {
+  transition: all 0.5s;
+  opacity: 0.8;
+  color: var(--color-nav);
+}
+a:hover,
+a:active {
+  opacity: 1;
+  color: var(--color-nav-hover);
+}
+
+strong {
+  font-weight: 700;
+}
+
+hr {
+  display: block;
+  width: 100%;
+  border-top: 1px solid var(--vt-c-green);
+}

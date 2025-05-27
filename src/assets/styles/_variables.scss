@@ -1,0 +1,85 @@
+/* _variables.scss */
+
+:root {
+  --vt-c-white: hsl(0, 0%, 100%);
+  --vt-c-white-soft: hsl(from var(--vt-c-white) h s calc(l - 5));
+  --vt-c-white-mute: hsl(from var(--vt-c-white) h s calc(l - 10));
+
+  --vt-c-black: hsl(from #181818 h s l);
+  --vt-c-black-soft: hsl(from #222222 h s l);
+  --vt-c-black-mute: hsl(from #282828 h s l);
+
+  --vt-c-gray: hsl(from #3c3c3c h s l);
+  --vt-c-gray-light: hsl(from var(--vt-c-gray) h s calc(l + 50));
+  --vt-c-gray-dark: hsl(from var(--vt-c-gray) h s calc(l - 50));
+
+  --vt-c-green: hsl(from #69764b h s l);
+  --vt-c-green-light: hsl(from var(--vt-c-green) h s calc(l + 10));
+  --vt-c-green-dark: hsl(from var(--vt-c-green) h s calc(l - 10));
+  --vt-c-green-bright: hsl(from #a3d52e h s l);
+
+  --vt-c-red: hsl(from #e50015 h s l);
+  --vt-c-red-light: hsl(from var(--vt-c-red) h s calc(l + 10));
+  --vt-c-red-dark: hsl(from var(--vt-c-red) h s calc(l - 10));
+
+  --vt-c-divider-light-1: hsla(0, 0%, 24%, 0.29);
+  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+
+  --blend-mode: soft-light;
+  --font-primary: 'montserrat', sans-serif;
+  --font-primary-heading: 'virnature', cursive;
+  --font-secondary-heading: 'lucy', cursive;
+}
+
+/* semantic color variables for this project */
+/* prefers-color-scheme: default/light */
+:root {
+  --color-background: var(--vt-c-white);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-green);
+  --color-text: var(--vt-c-green);
+  --color-link: var(--vt-c-green-light);
+  --color-link-hover: var(---vt-c-green);
+
+  --color-nav: var(--vt-c-green-light);
+  --color-nav-hover: var(--vt-c-green);
+  --color-nav-active: var(--vt-c-green-dark);
+  --color-background-blend: hsl(from var(--vt-c-white) h s l / 75%);
+  --color-background-opaque: hsl(from var(--vt-c-white) h s l / 85%);
+
+  --color-green-opaque: hsl(from var(--vt-c-green-light) h s l / 25%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    --color-border: var(--vt-c-divider-dark-2);
+    --color-border-hover: var(--vt-c-divider-dark-1);
+
+    --color-heading: var(--vt-c-white-soft);
+    --color-text: var(--vt-c-white-soft);
+    --color-link: var(--vt-c-gray-dark);
+    --color-link-hover: var(--vt-c-black-mute);
+
+    --color-nav: var(--vt-c-white-soft);
+    --color-nav-hover: var(--vt-c-white-mute);
+    --color-nav-active: var(--vt-c-white-soft);
+    --color-background-blend: hsl(from var(--vt-c-black) h s l / 85%);
+    --color-background-opaque: hsl(from var(--vt-c-black) h s l / 85%);
+
+    --color-green-opaque: hsl(from var(--vt-c-green-dark) h s l / 25%);
+  }
+}
