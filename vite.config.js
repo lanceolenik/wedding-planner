@@ -34,6 +34,7 @@ export default defineConfig({
     https: false,
     port: 5173,
   },
+  base: process.env.NODE_ENV === 'production' ? '/wedding/' : '/',
   build: {
     cssMinify: 'esbuild',
     rollupOptions: {
