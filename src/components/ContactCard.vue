@@ -71,13 +71,12 @@ const formattedPhone = computed(() => {
   h2 {
     margin-bottom: 10px;
   }
+  p {
+    margin: 0;
+  }
   a,
   a:link {
     text-decoration: none;
-  }
-  a:hover,
-  a:focus {
-    color: #000;
   }
 }
 
@@ -101,6 +100,25 @@ const formattedPhone = computed(() => {
   gap: 10px;
   a {
     text-decoration: none;
+    &:hover {
+      .icon {
+        transition: all 0.4s;
+      }
+      .icon-facebook {
+        color: #1877f2;
+      }
+      .icon-instagram {
+        color: #c13584;
+      }
+      .icon-snapchat {
+        color: #fffc00;
+        text-shadow:
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000,
+          1px 1px 0 #000;
+      }
+    }
   }
 }
 
@@ -110,19 +128,5 @@ const formattedPhone = computed(() => {
 }
 .icon:before {
   font-size: 30px;
-}
-.icon-facebook:hover {
-  color: #1877f2;
-}
-.icon-instagram:hover {
-  color: #c13584;
-}
-.icon-snapchat:hover {
-  color: #fffc00;
-  text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000;
 }
 </style>

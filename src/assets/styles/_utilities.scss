@@ -83,6 +83,10 @@ a.has-icon {
   background: var(--vt-c-green-dark) !important;
 }
 
+body.route-home .site-footer {
+  display: none;
+}
+
 /* Printer-friendly styles matching mobile table layout */
 @media print {
   body {

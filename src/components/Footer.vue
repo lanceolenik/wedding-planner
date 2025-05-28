@@ -13,8 +13,8 @@
   </footer>
 </template>
 
-<style lang="scss" scoped>
-footer {
+<style lang="scss">
+.site-footer {
   position: relative;
   font-size: 14px;
   padding: 50px 3px 10px;
@@ -27,11 +27,11 @@ footer {
       text-decoration: underline;
     }
   }
-  .route-home & {
-    display: none;
-  }
   .modal-open & {
     filter: blur(5px);
+  }
+  .route-home & {
+    display: none !important;
   }
   @media (max-width: 767px) {
     position: fixed;

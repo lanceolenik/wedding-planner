@@ -114,6 +114,7 @@ main > * {
   background-blend-mode: var(--blend-mode);
   color: var(--vt-c-green);
   .route-home & {
+    background: transparent !important;
     padding: 0;
   }
   @media (max-width: 767px) {

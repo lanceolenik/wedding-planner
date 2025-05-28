@@ -76,6 +76,7 @@ p,
 li,
 label {
   color: var(--color-text);
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 img {

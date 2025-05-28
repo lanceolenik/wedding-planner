@@ -5,7 +5,6 @@ import mkcert from 'vite-plugin-mkcert'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import purgeCss from 'vite-plugin-purgecss'
 import compression from 'vite-plugin-compression'
 
 // https://vite.dev/config/
@@ -15,7 +14,6 @@ export default defineConfig({
     vue(),
     vueJsx(),
     vueDevTools(),
-    purgeCss(),
     compression({
       algorithm: 'gzip', // Options: 'gzip', 'brotliCompress'
       ext: '.gz',

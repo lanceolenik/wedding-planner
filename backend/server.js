@@ -15,8 +15,6 @@ setupMiddleware(app)
 // MongoDB Connection
 mongoose
   .connect(config.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
   })

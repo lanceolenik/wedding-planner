@@ -6,7 +6,6 @@ import axios from 'axios'
 const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 const hotels = ref([])
-const rentals = ref([])
 const parks = ref([])
 const museumsZoos = ref([])
 const otherEntertainment = ref([])
@@ -56,7 +55,7 @@ const fetchHotels = async (locations) => {
     const cached = localStorage.getItem(cacheKey)
     if (cached) {
       hotels.value = JSON.parse(cached)
-      //console.log('Hotels loaded from cache:', hotels.value)
+      console.log('Hotels loaded from cache:', hotels.value)
       return
     }
     const allHotels = []
@@ -113,11 +112,11 @@ const fetchEntertainment = async (locations) => {
       parks.value = parks
       museumsZoos.value = museumsZoos
       otherEntertainment.value = otherEntertainment
-      /*console.log('Entertainment loaded from cache:', {
+      console.log('Entertainment loaded from cache:', {
         parks: parks.value,
         museumsZoos: museumsZoos.value,
         otherEntertainment: otherEntertainment.value,
-      })*/
+      })
       return
     }
 
@@ -230,14 +229,9 @@ onMounted(async () => {
       <div class="flex">
         <div class="type shadowed">
           <h2>Airports</h2>
-          <i
-            v-if="isLoading"
-            class="loading-icon icon-loading-flower"
-            title="Loading airports..."
-          ></i>
           <p>
             The nearest airport is Idaho Falls (IDA). Salt Lake City (SLC) or Boise (BOI) may be
-            cheaper to fly into, but SLC is about 3½ hours drive and BOI is about 4 hours.
+            cheaper to fly into, but SLC is about a 3 hour drive and BOI is about 4 hours.
           </p>
           <i class="circle icon-plane"></i>
         </div>
@@ -371,7 +365,7 @@ onMounted(async () => {
       margin-bottom: 20px;
     }
     .loading {
-      color: var(--vt-c-green);
+      color: var(--color-text);
       font-style: italic;
       margin-bottom: 20px;
     }
@@ -380,7 +374,7 @@ onMounted(async () => {
       animation: spin 2s linear infinite;
       font-size: 1.5rem; // Adjust size to match your design
       width: 25px;
-      color: var(--vt-c-green); // Match your theme
+      color: var(--color-text); // Match your theme
       margin-bottom: 10px;
     }
     @keyframes spin {
@@ -393,7 +387,6 @@ onMounted(async () => {
     }
     a,
     a:link {
-      color: rgb(var(--vt-c-green));
       text-decoration: none;
       padding-right: 30px;
       transition: all 0.25s ease-in-out;
@@ -408,7 +401,6 @@ onMounted(async () => {
     }
     a:hover,
     a:active {
-      color: rgb(var(--vt-c-green-dark));
       text-decoration: underline;
     }
     ul {
@@ -433,9 +425,7 @@ onMounted(async () => {
     .flex {
       display: flex;
       gap: 20px;
-      @media (max-width: 1024px) {
-        flex-wrap: wrap;
-      }
+      flex-wrap: wrap;
       @media (max-width: 767px) {
         flex-direction: column;
       }
@@ -450,15 +440,14 @@ onMounted(async () => {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
+      text-wrap: pretty;
       margin: 0;
       padding: 30px;
-      width: 33.33%;
+      width: calc(50% - 20px);
       overflow: hidden;
       z-index: 1;
-      @media (max-width: 1024px) {
-        &:first-child {
-          width: 100%;
-        }
+      &:first-child {
+        width: 100%;
       }
       .circle {
         position: absolute;
@@ -485,20 +474,17 @@ onMounted(async () => {
         }
         &.icon-vrbo {
           color: #0e214b;
+          @media (prefers-color-scheme: dark) {
+            color: #76c5f7;
+          }
         }
         &.icon-cozycozy {
           color: hsl(322.64, 43.44%, 52.16%);
-        }
-        &:hover {
-          color: #000;
         }
       }
       small {
         font-size: 10px;
         letter-spacing: 0;
-      }
-      a:hover {
-        color: var(--vt-c-black-mute);
       }
       @media (max-width: 767px) {
         flex-direction: column;
