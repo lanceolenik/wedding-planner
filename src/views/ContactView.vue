@@ -1,6 +1,9 @@
 <script setup>
 import ContactForm from '../components/ContactForm.vue'
-import ContactCard from '../components/ContactCard.vue'
+import ContactCard from '../components/ContactCard.vue' // Import the images
+
+import graceAvatar from '@/assets/grace.jpg'
+import michaelAvatar from '@/assets/michael.jpg'
 </script>
 <template>
   <div class="contact">
@@ -11,7 +14,7 @@ import ContactCard from '../components/ContactCard.vue'
           name="Grace Olenik"
           email="grace@oleniks.net"
           phone="2082013956"
-          avatar="/src/assets/grace.jpg"
+          :avatar="graceAvatar"
           instagram="https://www.instagram.com/gracie__olenik/"
           facebook="https://www.facebook.com/profile.php?id=61557081781201"
           snapchat="https://snapchat.com/t/1K4pSTPV"
@@ -20,7 +23,7 @@ import ContactCard from '../components/ContactCard.vue'
           name="Michael Morin"
           email=""
           phone="7604728794"
-          avatar="/src/assets/michael.jpg"
+          :avatar="michaelAvatar"
           instagram="https://www.instagram.com/gracie__olenik/"
           facebook="https://www.facebook.com/profile.php?id=61551019472330"
           snapchat="https://snapchat.com/t/1QXPUb2P"
