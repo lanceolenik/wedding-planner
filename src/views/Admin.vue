@@ -44,6 +44,8 @@ const username = ref('')
 const error = ref('')
 const printingTable = ref(null)
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+
 // Debug log to check rsvps initialization
 //console.log('Admin: Initial rsvps:', rsvps.value)
 
@@ -56,10 +58,10 @@ const fetchData = async () => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
 
     const [userRes, contactsRes, helpRes, rsvpsRes] = await Promise.all([
-      axios.get('http://localhost:5001/api/admin/user', config),
-      axios.get('http://localhost:5001/api/admin/contacts', config),
-      axios.get('http://localhost:5001/api/admin/help', config),
-      axios.get('http://localhost:5001/api/admin/rsvps', config),
+      axios.get(`${baseURL}/api/admin/user`, config),
+      axios.get(`${baseURL}/api/admin/contacts`, config),
+      axios.get(`${baseURL}/api/admin/help`, config),
+      axios.get(`${baseURL}/api/admin/rsvps`, config),
     ])
 
     username.value = userRes.data.username || 'n/a'

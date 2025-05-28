@@ -4,7 +4,7 @@ import axios from 'axios'
 
 // Define range of zip codes
 const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
 const hotels = ref([])
 const parks = ref([])
 const museumsZoos = ref([])
@@ -16,21 +16,15 @@ const parksLoading = ref(false)
 const museumsZoosLoading = ref(false)
 const otherEntertainmentLoading = ref(false)
 
-// Fallback coordinates for Idaho Falls (central point for the range)
+// Fallback coordinates for Idaho Falls
 const fallbackLocation = { lat: 43.4917, lng: -112.033 }
 
 // Geocode a single zip code to lat/lng
 const geocodeZip = async (zip) => {
   try {
-    //console.log('Sending request to:', `${apiUrl}/api/google-geocode?address=${zip}`)
-    /*console.log('Full axios config:', {
-      url: `${apiUrl}/api/google-geocode`,
-      params: { address: zip },
-    })*/
     const response = await axios.get(`${apiUrl}/api/google-geocode`, {
       params: { address: zip },
     })
-    //console.log('Geocode response for', zip, ':', response.data)
     if (response.data.status !== 'OK' || !response.data.results[0]) {
       throw new Error(
         `Geocoding failed for ${zip}: ${response.data.status}, error: ${response.data.error_message || 'Unknown'}`,
@@ -55,7 +49,6 @@ const fetchHotels = async (locations) => {
     const cached = localStorage.getItem(cacheKey)
     if (cached) {
       hotels.value = JSON.parse(cached)
-      console.log('Hotels loaded from cache:', hotels.value)
       return
     }
     const allHotels = []
@@ -68,7 +61,11 @@ const fetchHotels = async (locations) => {
             type: 'lodging',
           },
         })
-        //console.log('Hotels response for location', location, ':', response.data)
+        if (response.data.status !== 'OK') {
+          throw new Error(
+            `Hotel fetch failed: ${response.data.status}, error: ${response.data.error_message || 'Unknown'}`,
+          )
+        }
         allHotels.push(...response.data.results)
       }
     }
@@ -93,7 +90,7 @@ const fetchHotels = async (locations) => {
       response: err.response?.data,
       status: err.response?.status,
     })
-    error.value = 'Failed to load accommodations.'
+    error.value = 'Failed to load accommodations. Please try again later.'
   } finally {
     hotelsLoading.value = false
   }
@@ -112,11 +109,6 @@ const fetchEntertainment = async (locations) => {
       parks.value = parks
       museumsZoos.value = museumsZoos
       otherEntertainment.value = otherEntertainment
-      console.log('Entertainment loaded from cache:', {
-        parks: parks.value,
-        museumsZoos: museumsZoos.value,
-        otherEntertainment: otherEntertainment.value,
-      })
       return
     }
 
@@ -151,12 +143,11 @@ const fetchEntertainment = async (locations) => {
                 type,
               },
             })
-            /*console.log(
-              `${typeArray[0]} (${type}) response for location`,
-              location,
-              ':',
-              response.data,
-            )*/
+            if (response.data.status !== 'OK') {
+              throw new Error(
+                `${type} fetch failed: ${response.data.status}, error: ${response.data.error_message || 'Unknown'}`,
+              )
+            }
             allResults.push(...response.data.results.filter(filterPlaces))
           }
         }
@@ -187,8 +178,12 @@ const fetchEntertainment = async (locations) => {
       }),
     )
   } catch (err) {
-    console.error('Entertainment fetch error:', err)
-    error.value = 'Failed to load entertainment options.'
+    console.error('Entertainment fetch error:', {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
+    })
+    error.value = 'Failed to load entertainment options. Please try again later.'
   } finally {
     parksLoading.value = false
     museumsZoosLoading.value = false
@@ -372,9 +367,9 @@ onMounted(async () => {
     .loading-icon {
       display: inline-block;
       animation: spin 2s linear infinite;
-      font-size: 1.5rem; // Adjust size to match your design
+      font-size: 1.5rem;
       width: 25px;
-      color: var(--color-text); // Match your theme
+      color: var(--color-text);
       margin-bottom: 10px;
     }
     @keyframes spin {

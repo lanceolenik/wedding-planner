@@ -3,7 +3,9 @@
     <!-- Modal rendering -->
     <div v-if="!inline" class="rsvp-modal-overlay">
       <div class="rsvp-modal-content shadowed --notransparency">
-        <button v-if="!submitted" @click="close" class="rsvp-close-btn">✖</button>
+        <button v-if="!submitted || confirmationMessage" @click="close" class="rsvp-close-btn">
+          ✖
+        </button>
 
         <h2 v-if="!submitted">Wedding RSVP</h2>
         <p v-if="!submitted"><small>* Indicates a required field.</small></p>
@@ -160,7 +162,8 @@ const formIsValid = computed(() => {
   return (
     form.value.name.trim() &&
     form.value.email.trim().match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) &&
-    /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(form.value.phone)
+    /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(form.value.phone) &&
+    form.value.attending !== ''
   )
 })
 
@@ -201,6 +204,10 @@ const submitForm = async () => {
         ? 'Your RSVP has been updated! Thank you for letting us know.'
         : 'Your RSVP has been received! Thank you!'
     emit('submitted')
+    setTimeout(function () {
+      document.body.classList.remove('modal-open')
+      emit('close')
+    }, 2000)
   } catch (err) {
     alert('Failed to submit RSVP.')
     console.error(err)
