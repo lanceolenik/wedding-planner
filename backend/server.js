@@ -9,6 +9,8 @@ import { Rsvp } from './models/rsvp.js'
 // Define base path for API routes (relative path)
 const apiBasePath = '/api'
 
+app.get(`${apiBasePath}/health`, (req, res) => res.json({ status: 'OK' }))
+
 // Initialize Express app
 const app = express()
 
@@ -54,12 +56,10 @@ app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
       status: err.response?.status,
       axiosError: err.toJSON?.() || err,
     })
-    res
-      .status(err.response?.status || 500)
-      .json({
-        error: 'Failed to fetch Google API data',
-        details: err.response?.data || err.message,
-      })
+    res.status(err.response?.status || 500).json({
+      error: 'Failed to fetch Google API data',
+      details: err.response?.data || err.message,
+    })
   }
 })
 
@@ -107,5 +107,5 @@ app.use(compression())
 
 // Start HTTP Server
 app.listen(config.PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${config.PORT}`)
+  console.log(`🚀 Server running at: ${config.PORT}`)
 })

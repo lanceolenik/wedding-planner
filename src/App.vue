@@ -86,7 +86,9 @@ onBeforeUnmount(() => {
     <main>
       <RouterView v-slot="{ Component }">
         <transition name="fade" mode="out-in">
-          <component :is="Component" />
+          <KeepAlive>
+            <component :is="Component" />
+          </KeepAlive>
         </transition>
       </RouterView>
     </main>
