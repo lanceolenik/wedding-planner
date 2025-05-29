@@ -1,7 +1,7 @@
 import express from 'express'
 import compression from 'compression'
 import mongoose from 'mongoose'
-import { setupMiddleware, authenticateToken } from './middleware.js'
+import { setupMiddleware, authenticateToken } from './middleware.js' // Assuming authenticateToken is also used somewhere, even if not in this snippet
 import { config } from './config.js'
 import axios from 'axios'
 import { Rsvp } from './models/rsvp.js'
@@ -61,10 +61,6 @@ app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
   }
 })
 
-app.get(`${apiBasePath}/health`, (req, res) => {
-  res.json({ status: 'Node.js App is Running', timestamp: new Date().toISOString() })
-})
-
 app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
@@ -94,7 +90,7 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   }
 })
 
-// Import and mount routes
+// Import and mount routes (these will now be checked AFTER your specific Google proxy routes)
 import authRoutes from './routes/auth.js'
 import adminRoutes from './routes/admin.js'
 import invitesRoutes from './routes/invites.js'
