@@ -3,32 +3,32 @@ name: Deploy to FTP
 on:
   push:
     branches:
-      - main  # or 'master' or your desired branch
+      - main # or 'master' or your desired branch
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20  # or your preferred Node version
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # or your preferred Node version
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build Vue project
-      run: npm run build
+      - name: Build Vue project
+        run: npm run build
 
-    - name: Upload to FTP
-      uses: SamKirkland/FTP-Deploy-Action@4
-      with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: ${{ secrets.FTP_TARGET_DIR }}
-        local-dir: dist/
+      - name: Upload to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_TARGET_DIR }}
+          local-dir: dist/
