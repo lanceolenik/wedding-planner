@@ -44,8 +44,7 @@ const username = ref('')
 const error = ref('')
 const printingTable = ref(null)
 
-// Debug log to check rsvps initialization
-//console.log('Admin: Initial rsvps:', rsvps.value)
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 const fetchData = async () => {
   try {
@@ -56,10 +55,10 @@ const fetchData = async () => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
 
     const [userRes, contactsRes, helpRes, rsvpsRes] = await Promise.all([
-      axios.get(import.meta.env.VITE_API_URL + '/api/admin/user', config),
-      axios.get(import.meta.env.VITE_API_URL + '/api/admin/contacts', config),
-      axios.get(import.meta.env.VITE_API_URL + '/api/admin/help', config),
-      axios.get(import.meta.env.VITE_API_URL + '/api/admin/rsvps', config),
+      axios.get(`${apiUrl}/api/admin/user`, config),
+      axios.get(`${apiUrl}/api/admin/contacts`, config),
+      axios.get(`${apiUrl}/api/admin/help`, config),
+      axios.get(`${apiUrl}/api/admin/rsvps`, config),
     ])
 
     username.value = userRes.data.username || 'n/a'
@@ -67,7 +66,6 @@ const fetchData = async () => {
     helpEntries.value = helpRes.data
     rsvps.value = rsvpsRes.data
     originalRsvps.value = [...rsvpsRes.data]
-    //console.log('Admin: Fetched rsvps:', rsvps.value)
   } catch (err) {
     error.value = err.response?.data?.error || 'Failed to fetch data'
     if (err.response?.status === 401 || err.response?.status === 403) {
@@ -88,29 +86,24 @@ const printTable = (payload) => {
     return
   }
   const { type, sortedData } = payload
-  //console.log('Admin: Print payload:', { type, sortedData })
 
   printingTable.value = type
 
   // Store original RSVPs and apply sorted data for RSVP table
   if (type === 'rsvp' && sortedData) {
-    //console.log('Admin: Setting rsvps to sortedData:', sortedData)
     rsvps.value = sortedData
   }
 
   document.body.setAttribute('data-printing-active', type)
   setTimeout(() => {
-    //console.log('Admin: Printing with printingTable:', printingTable.value)
     window.print()
     setTimeout(() => {
       printingTable.value = null
       document.body.removeAttribute('data-printing-active')
       // Restore original RSVPs
       if (type === 'rsvp') {
-        //console.log('Admin: Restoring original rsvps:', originalRsvps.value)
         rsvps.value = [...originalRsvps.value]
       }
-      //console.log('Admin: Reset printingTable to null')
     }, 100)
   }, 500)
 }
