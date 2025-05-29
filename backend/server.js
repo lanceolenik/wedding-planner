@@ -9,8 +9,6 @@ import { Rsvp } from './models/rsvp.js'
 // Define base path for API routes (relative path)
 const apiBasePath = '/api'
 
-app.get(`${apiBasePath}/health`, (req, res) => res.json({ status: 'OK' }))
-
 // Initialize Express app
 const app = express()
 
@@ -63,6 +61,10 @@ app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
   }
 })
 
+app.get(`${apiBasePath}/health`, (req, res) => {
+  res.json({ status: 'Node.js App is Running', timestamp: new Date().toISOString() })
+})
+
 app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
@@ -71,8 +73,10 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
     const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
     })
+    console.log('Google Geocode Response:', response.data) // Log for debugging
     if (response.data.status !== 'OK') {
-      console.warn('Google Geocode response:', response.data)
+      console.warn('Google Geocode warning:', response.data)
+      return res.status(400).json(response.data) // Return Google’s error response
     }
     res.json(response.data)
   } catch (err) {
@@ -81,10 +85,12 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
       response: err.response?.data,
       status: err.response?.status,
       axiosError: err.toJSON?.() || err,
+      query: req.query,
     })
-    res
-      .status(err.response?.status || 500)
-      .json({ error: 'Failed to fetch geocode data', details: err.response?.data || err.message })
+    res.status(err.response?.status || 500).json({
+      error: 'Failed to fetch geocode data',
+      details: err.response?.data || err.message,
+    })
   }
 })
 
