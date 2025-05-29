@@ -9,6 +9,8 @@ import { Rsvp } from './models/rsvp.js'
 // Define base path for API routes (relative path)
 const apiBasePath = '/api'
 
+app.get(`${apiBasePath}/health`, (req, res) => res.json({ status: 'OK' }))
+
 // Initialize Express app
 const app = express()
 
