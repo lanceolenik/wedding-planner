@@ -1,6 +1,7 @@
 import express from 'express'
 import compression from 'compression'
 import mongoose from 'mongoose'
+import cors from 'cors'
 import { setupMiddleware, authenticateToken } from './middleware.js'
 import { config } from './config.js'
 import axios from 'axios'
@@ -8,6 +9,17 @@ import { Rsvp } from './models/rsvp.js'
 
 // Initialize Express app
 const app = express()
+
+// Define API base path based on environment
+const apiBasePath = process.env.NODE_ENV === 'production' ? '/wedding/api' : '/api'
+
+// Set up CORS for production
+app.use(
+  cors({
+    origin: process.env.VITE_APP_URL || 'http://localhost:5001', // Allow frontend origin
+    credentials: true, // Support JWT tokens
+  }),
+)
 
 // Set up middleware
 setupMiddleware(app)
@@ -31,12 +43,12 @@ Rsvp.collection.createIndex({ email: 1 }, { unique: true }, (err) => {
 })
 
 // Proxy endpoint for Google Maps API
-app.get('/api/google-places/*', async (req, res) => {
+app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
       return res.status(500).json({ error: 'Google API key not configured' })
     }
-    const url = `https://maps.googleapis.com/maps/api/place${req.path.replace('/api/google-places', '')}`
+    const url = `https://maps.googleapis.com/maps/api/place${req.path.replace(apiBasePath + '/google-places', '')}`
     const response = await axios.get(url, {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
     })
@@ -47,7 +59,7 @@ app.get('/api/google-places/*', async (req, res) => {
   }
 })
 
-app.get('/api/google-geocode', async (req, res) => {
+app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
       return res.status(500).json({ error: 'Google API key not configured' })
@@ -70,16 +82,17 @@ import contactRoutes from './routes/contact.js'
 import helpRoutes from './routes/help.js'
 import rsvpRoutes from './routes/rsvp.js'
 
-app.use('/api', authRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/invites', invitesRoutes)
-app.use('/api/contact', contactRoutes)
-app.use('/api/help', helpRoutes)
-app.use('/api/rsvp', rsvpRoutes)
+app.use(apiBasePath, authRoutes)
+app.use(`${apiBasePath}/admin`, adminRoutes)
+app.use(`${apiBasePath}/invites`, invitesRoutes)
+app.use(`${apiBasePath}/contact`, contactRoutes)
+app.use(`${apiBasePath}/help`, helpRoutes)
+app.use(`${apiBasePath}/rsvp`, rsvpRoutes)
 
 app.use(compression())
 
 // Start HTTP Server
-app.listen(config.PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${config.PORT}`)
+const port = process.env.PORT || 5001 // Default to 5001 for local dev, Namecheap assigns in prod
+app.listen(port, () => {
+  console.log(`🚀 Server running on port ${port}`)
 })
