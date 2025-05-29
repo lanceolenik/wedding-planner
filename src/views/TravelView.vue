@@ -55,7 +55,6 @@ const fetchHotels = async (locations) => {
     const allHotels = []
     for (const location of locations) {
       if (location) {
-        console.log(`${apiUrl}/api/google-places/nearbysearch/json`)
         const response = await axios.get(`${apiUrl}/api/google-places/nearbysearch/json`, {
           params: {
             location: `${location.lat},${location.lng}`,
