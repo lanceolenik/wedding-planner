@@ -4,7 +4,7 @@ import axios from 'axios'
 
 // Define range of zip codes
 const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
-const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 const hotels = ref([])
 const parks = ref([])
 const museumsZoos = ref([])
@@ -198,12 +198,29 @@ const fetchEntertainment = async (locations) => {
 // Initialize data fetching
 onMounted(async () => {
   isLoading.value = true
-  const locations = await Promise.all(zipCodes.map((zip) => geocodeZip(zip)))
-  const validLocations = locations.filter((loc) => loc !== null)
-  if (validLocations.length === 0) {
-    validLocations.push(fallbackLocation)
+  // Check cache before making API calls
+  const hotelCacheKey = `hotels_${zipCodes.join('-')}`
+  const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
+  const hotelCached = localStorage.getItem(hotelCacheKey)
+  const entertainmentCached = localStorage.getItem(entertainmentCacheKey)
+
+  if (hotelCached) hotels.value = JSON.parse(hotelCached)
+  if (entertainmentCached) {
+    const { parks, museumsZoos, otherEntertainment } = JSON.parse(entertainmentCached)
+    parks.value = parks
+    museumsZoos.value = museumsZoos
+    otherEntertainment.value = otherEntertainment
   }
-  await Promise.all([fetchHotels(validLocations), fetchEntertainment(validLocations)])
+
+  // Only proceed with API calls if no valid cache
+  if (!hotelCached || !entertainmentCached) {
+    const locations = await Promise.all(zipCodes.map((zip) => geocodeZip(zip)))
+    const validLocations = locations.filter((loc) => loc !== null)
+    if (validLocations.length === 0) {
+      validLocations.push(fallbackLocation)
+    }
+    await Promise.all([fetchHotels(validLocations), fetchEntertainment(validLocations)])
+  }
   isLoading.value = false
 })
 </script>

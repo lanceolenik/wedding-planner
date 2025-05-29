@@ -11,7 +11,7 @@ export const setupMiddleware = (app) => {
         'https://localhost:5173',
         'https://localhost:5001',
         'http://localhost:5001',
-        'https://new-domain.com', // update in production
+        'https://oleniks.net/wedding', // update in production
       ],
       methods: 'GET,POST,PUT,DELETE,OPTIONS',
       allowedHeaders: ['Content-Type', 'Authorization'],

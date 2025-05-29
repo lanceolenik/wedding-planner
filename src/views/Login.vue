@@ -34,6 +34,8 @@ const isLogin = ref(true)
 const form = ref({ username: '', password: '' })
 const error = ref('')
 
+const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+
 const toggleMode = () => {
   isLogin.value = !isLogin.value
   error.value = ''
@@ -43,7 +45,7 @@ const toggleMode = () => {
 const handleSubmit = async () => {
   try {
     const endpoint = isLogin.value ? '/api/login' : '/api/register'
-    const response = await axios.post(`http://localhost:5001${endpoint}`, form.value)
+    const response = await axios.post(`${apiUrl}${endpoint}`, form.value)
 
     if (isLogin.value) {
       localStorage.setItem('token', response.data.token)
