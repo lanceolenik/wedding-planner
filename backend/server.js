@@ -6,6 +6,9 @@ import { config } from './config.js'
 import axios from 'axios'
 import { Rsvp } from './models/rsvp.js'
 
+// Define base path for API routes (relative path)
+const apiBasePath = '/api'
+
 // Initialize Express app
 const app = express()
 
@@ -31,23 +34,36 @@ Rsvp.collection.createIndex({ email: 1 }, { unique: true }, (err) => {
 })
 
 // Proxy endpoint for Google Maps API
-app.get('/api/google-places/*', async (req, res) => {
+app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
       return res.status(500).json({ error: 'Google API key not configured' })
     }
-    const url = `https://maps.googleapis.com/maps/api/place${req.path.replace('/api/google-places', '')}`
+    const url = `https://maps.googleapis.com/maps/api/place${req.path.replace(`${apiBasePath}/google-places`, '')}`
     const response = await axios.get(url, {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
     })
+    if (response.data.status !== 'OK') {
+      console.warn('Google Places response:', response.data)
+    }
     res.json(response.data)
   } catch (err) {
-    console.error('Google API proxy error:', err.response?.data || err.message)
-    res.status(err.response?.status || 500).json({ error: 'Failed to fetch Google API data' })
+    console.error('Google API proxy error:', {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
+      axiosError: err.toJSON?.() || err,
+    })
+    res
+      .status(err.response?.status || 500)
+      .json({
+        error: 'Failed to fetch Google API data',
+        details: err.response?.data || err.message,
+      })
   }
 })
 
-app.get('/api/google-geocode', async (req, res) => {
+app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
       return res.status(500).json({ error: 'Google API key not configured' })
@@ -55,10 +71,20 @@ app.get('/api/google-geocode', async (req, res) => {
     const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
     })
+    if (response.data.status !== 'OK') {
+      console.warn('Google Geocode response:', response.data)
+    }
     res.json(response.data)
   } catch (err) {
-    console.error('Google Geocode proxy error:', err.response?.data || err.message)
-    res.status(err.response?.status || 500).json({ error: 'Failed to fetch geocode data' })
+    console.error('Google Geocode proxy error:', {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status,
+      axiosError: err.toJSON?.() || err,
+    })
+    res
+      .status(err.response?.status || 500)
+      .json({ error: 'Failed to fetch geocode data', details: err.response?.data || err.message })
   }
 })
 
