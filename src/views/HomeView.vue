@@ -32,13 +32,13 @@ const clearRSVP = () => {
       <h2>She said yes!</h2>
       <p>June 6, 2026 at 2:00 PM | Really Cool Venue</p>
       <div class="rsvp-button-wrapper">
-        <button v-if="!rsvpConfirmed" @click="showForm = true" class="rsvp-btn">
+        <!--HIDE UNTIL READY:<button v-if="!rsvpConfirmed" @click="showForm = true" class="rsvp-btn">
           <i class="icon-checkbox"></i> RSVP Now
         </button>
         <div v-else>
           <p><i class="icon-checkmark"></i> You’ve responded – thanks!</p>
           <button @click="clearRSVP">Reset RSVP</button>
-        </div>
+        </div>-->
       </div>
     </header>
     <!-- RSVP Popup -->
@@ -76,12 +76,16 @@ const clearRSVP = () => {
   width: 100%;
   height: 100vh;
   max-height: 100vh;
-  background: url(@/assets/couple3.webp);
+  /*background: url(@/assets/couple3.webp);*/
   background-position: 45% 45%;
+  background: url(@/assets/proposal.jpg);
+  background-position: top center;
   background-size: cover;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
-  @media (max-width: 767px) {
-    padding-bottom: 100px;
+  z-index: 2;
+  * {
+    position: relative;
+    z-index: 3;
   }
   h1 {
     position: relative;
@@ -146,6 +150,24 @@ const clearRSVP = () => {
     @media (max-width: 400px) or (max-height: 375px) {
       margin: 0;
     }
+  }
+  &:before {
+    content: 'test';
+    mask: linear-gradient(
+      rgba(255, 255, 255, 0.01) 0,
+      rgba(255, 255, 255, 0.01) 50%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+    backdrop-filter: brightness(0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+  }
+  @media (max-width: 767px) {
+    padding-bottom: 100px;
   }
 }
 </style>

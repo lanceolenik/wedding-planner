@@ -41,7 +41,7 @@ export default {
   <div class="wedding">
     <div class="container">
       <h1 class="hasHr">The Wedding</h1>
-      <div class="rsvp-button-wrapper">
+      <!-- Hide until ready:<div class="rsvp-button-wrapper">
         <button v-if="!rsvpConfirmed" @click="showForm = true" class="rsvp-btn">
           <i class="icon-checkbox"></i> RSVP Now
         </button>
@@ -49,7 +49,6 @@ export default {
           <p><i class="icon-checkmark"></i> You’ve responded – thanks!</p>
           <button @click="clearRSVP">Reset RSVP</button>
         </div>
-        <!-- RSVP Popup -->
         <transition name="fade">
           <RsvpForm
             v-if="showForm"
@@ -58,14 +57,14 @@ export default {
             @submitted="handleRSVP"
           />
         </transition>
-      </div>
+      </div>-->
       <div class="where shadowed">
         <h2>Where</h2>
         <tippy content="<i class='icon wedding-icons icon-map'></i> Get directions">
           <a class="map" href="https://maps.app.goo.gl/hxu1y68Ne3FrQBV78" target="_blank">
             <i class="icon wedding-icons icon-location_on" title="The Wedding"></i>
             <span class="address">
-              <strong>Really Cool Venue</strong><br />
+              <strong>?</strong><br />
               123 Cool Street<br />Idaho Falls, ID
             </span>
             <small>Get Directions</small>
@@ -87,8 +86,8 @@ export default {
               title="The Wedding"
             ></i>
             <span class="grid">
-              <strong>Date: </strong><span>June 6, 2026</span> <strong>Start: </strong
-              ><span>2:00 PM</span> <strong>End: </strong><span>5:00 PM</span>
+              <strong>Date: </strong><span>?</span> <strong>Start: </strong><span>?</span>
+              <strong>End: </strong><span>?</span>
             </span>
             <small>Add to Calendar</small>
           </a>
