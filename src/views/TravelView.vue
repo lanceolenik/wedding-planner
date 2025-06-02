@@ -2,6 +2,39 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
+// Helper for localStorage with expiration
+const setCacheItem = (key, data, expiresInDays) => {
+  const now = new Date().getTime()
+  const item = {
+    data: data,
+    expiry: now + expiresInDays * 24 * 60 * 60 * 1000, // expiry in milliseconds
+  }
+  localStorage.setItem(key, JSON.stringify(item))
+}
+
+const getCacheItem = (key) => {
+  const itemStr = localStorage.getItem(key)
+  if (!itemStr) {
+    return null // No item found
+  }
+
+  try {
+    const item = JSON.parse(itemStr)
+    const now = new Date().getTime()
+
+    if (now > item.expiry) {
+      localStorage.removeItem(key) // Item expired, remove it
+      console.log(`Cache for ${key} expired and removed.`)
+      return null
+    }
+    return item.data // Return the actual data
+  } catch (e) {
+    console.error(`Error parsing cache item ${key}:`, e)
+    localStorage.removeItem(key) // Clear potentially corrupted item
+    return null
+  }
+}
+
 // Define range of zip codes
 const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
@@ -46,12 +79,15 @@ const geocodeZip = async (zip) => {
 const fetchHotels = async (locations) => {
   hotelsLoading.value = true
   try {
-    const cacheKey = `hotels_${zipCodes.join('-')}`
-    const cached = localStorage.getItem(cacheKey)
-    if (cached) {
-      hotels.value = JSON.parse(cached)
-      return
+    const hotelsCacheKey = `hotels_${zipCodes.join('-')}`
+    // Use getCacheItem
+    const hotelsCachedData = getCacheItem(hotelsCacheKey) // This will be null if expired or not found
+    if (hotelsCachedData) {
+      hotels.value = hotelsCachedData
+      return // Exit if valid cache found
     }
+
+    // Proceed with API call if no valid cache
     const allHotels = []
     for (const location of locations) {
       if (location) {
@@ -73,7 +109,7 @@ const fetchHotels = async (locations) => {
     const uniqueHotels = Array.from(
       new Map(allHotels.map((item) => [item.place_id, item])).values(),
     )
-    hotels.value = uniqueHotels
+    const filteredHotels = uniqueHotels
       .filter((place) => place.rating >= 3.5)
       .slice(0, 5)
       .map((place) => ({
@@ -84,7 +120,9 @@ const fetchHotels = async (locations) => {
           place.website ||
           `https://www.google.com/search?q=${encodeURIComponent(place.name + ' Idaho Falls')}`,
       }))
-    localStorage.setItem(cacheKey, JSON.stringify(hotels.value))
+    hotels.value = filteredHotels
+    // Use setCacheItem with expiration
+    setCacheItem(hotelsCacheKey, filteredHotels, 7) // Cache for 7 days
   } catch (err) {
     console.error('Hotels fetch error:', {
       message: err.message,
@@ -100,20 +138,31 @@ const fetchHotels = async (locations) => {
 
 // Fetch entertainment options for multiple locations
 const fetchEntertainment = async (locations) => {
+  console.log(locations)
   parksLoading.value = true
   museumsZoosLoading.value = true
   otherEntertainmentLoading.value = true
   try {
-    const cacheKey = `entertainment_${zipCodes.join('-')}`
-    const cached = localStorage.getItem(cacheKey)
-    if (cached) {
-      const { parks, museumsZoos, otherEntertainment } = JSON.parse(cached)
-      parks.value = parks
-      museumsZoos.value = museumsZoos
-      otherEntertainment.value = otherEntertainment
-      return
+    const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
+    // Use getCacheItem
+    const entertainmentCachedData = getCacheItem(entertainmentCacheKey) // This will be null if expired or not found
+    if (entertainmentCachedData) {
+      const {
+        parks: cachedParks,
+        museumsZoos: cachedMuseumsZoos,
+        otherEntertainment: cachedOtherEntertainment,
+      } = entertainmentCachedData
+      parks.value = cachedParks
+      museumsZoos.value = cachedMuseumsZoos
+      otherEntertainment.value = cachedOtherEntertainment
+      // Set loading states to false immediately if loaded from cache
+      parksLoading.value = false
+      museumsZoosLoading.value = false
+      otherEntertainmentLoading.value = false
+      return // Exit if valid cache found
     }
 
+    // Proceed with API call if no valid cache
     const parkTypes = ['park']
     const museumZooTypes = ['museum', 'zoo']
     const otherTypes = ['theater', 'bowling_alley']
@@ -168,17 +217,23 @@ const fetchEntertainment = async (locations) => {
       }))
     }
 
-    parks.value = await fetchCategory(parkTypes, parks.value)
-    museumsZoos.value = await fetchCategory(museumZooTypes, museumsZoos.value)
-    otherEntertainment.value = await fetchCategory(otherTypes, otherEntertainment.value)
+    const fetchedParks = await fetchCategory(parkTypes, parks.value)
+    const fetchedMuseumsZoos = await fetchCategory(museumZooTypes, museumsZoos.value)
+    const fetchedOtherEntertainment = await fetchCategory(otherTypes, otherEntertainment.value)
 
-    localStorage.setItem(
-      cacheKey,
-      JSON.stringify({
-        parks: parks.value,
-        museumsZoos: museumsZoos.value,
-        otherEntertainment: otherEntertainment.value,
-      }),
+    parks.value = fetchedParks
+    museumsZoos.value = fetchedMuseumsZoos
+    otherEntertainment.value = fetchedOtherEntertainment
+
+    // Use setCacheItem with expiration
+    setCacheItem(
+      entertainmentCacheKey,
+      {
+        parks: fetchedParks,
+        museumsZoos: fetchedMuseumsZoos,
+        otherEntertainment: fetchedOtherEntertainment,
+      },
+      7, // Cache for 7 days
     )
   } catch (err) {
     console.error('Entertainment fetch error:', {
@@ -198,28 +253,50 @@ const fetchEntertainment = async (locations) => {
 // Initialize data fetching
 onMounted(async () => {
   isLoading.value = true
-  // Check cache before making API calls
-  const hotelCacheKey = `hotels_${zipCodes.join('-')}`
-  const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
-  const hotelCached = localStorage.getItem(hotelCacheKey)
-  const entertainmentCached = localStorage.getItem(entertainmentCacheKey)
 
-  if (hotelCached) hotels.value = JSON.parse(hotelCached)
-  if (entertainmentCached) {
-    const { parks, museumsZoos, otherEntertainment } = JSON.parse(entertainmentCached)
-    parks.value = parks
-    museumsZoos.value = museumsZoos
-    otherEntertainment.value = otherEntertainment
+  const hotelsCacheKey = `hotels_${zipCodes.join('-')}`
+  const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
+
+  // Check cache for hotels using getCacheItem
+  const hotelCachedData = getCacheItem(hotelsCacheKey)
+  if (hotelCachedData) {
+    hotels.value = hotelCachedData
+    hotelsLoading.value = false // Turn off loading if cached
   }
 
-  // Only proceed with API calls if no valid cache
-  if (!hotelCached || !entertainmentCached) {
+  // Check cache for entertainment using getCacheItem
+  const entertainmentCachedData = getCacheItem(entertainmentCacheKey)
+  if (entertainmentCachedData) {
+    const {
+      parks: cachedParks,
+      museumsZoos: cachedMuseumsZoos,
+      otherEntertainment: cachedOtherEntertainment,
+    } = entertainmentCachedData
+    parks.value = cachedParks
+    museumsZoos.value = cachedMuseumsZoos
+    otherEntertainment.value = cachedOtherEntertainment
+    parksLoading.value = false // Turn off loading if cached
+    museumsZoosLoading.value = false
+    otherEntertainmentLoading.value = false
+  }
+
+  // Only proceed with API calls if any cache is NOT valid
+  if (!hotelCachedData || !entertainmentCachedData) {
     const locations = await Promise.all(zipCodes.map((zip) => geocodeZip(zip)))
     const validLocations = locations.filter((loc) => loc !== null)
     if (validLocations.length === 0) {
       validLocations.push(fallbackLocation)
     }
-    await Promise.all([fetchHotels(validLocations), fetchEntertainment(validLocations)])
+
+    const promisesToRun = []
+    if (!hotelCachedData) {
+      promisesToRun.push(fetchHotels(validLocations))
+    }
+    if (!entertainmentCachedData) {
+      promisesToRun.push(fetchEntertainment(validLocations))
+    }
+
+    await Promise.all(promisesToRun)
   }
   isLoading.value = false
 })

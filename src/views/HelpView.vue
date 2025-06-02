@@ -25,7 +25,9 @@ import HelpForm from '../components/HelpForm.vue'
           </ul>
         </div>
       </div>
+      <!-- Hide until ready:
       <HelpForm />
+      -->
     </div>
   </div>
 </template>

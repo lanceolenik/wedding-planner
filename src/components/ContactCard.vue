@@ -1,3 +1,30 @@
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  name: String,
+  email: String,
+  phone: String,
+  avatar: String,
+  instagram: String,
+  facebook: String,
+  snapchat: String,
+})
+
+// Computed property to format the phone number
+const formattedPhone = computed(() => {
+  if (!props.phone) return ''
+  // Remove any non-digit characters
+  const digits = props.phone.replace(/\D/g, '')
+  // Format as (xxx) xxx-xxxx
+  if (digits.length >= 10) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+  }
+  // Return original if not enough digits
+  return props.phone
+})
+</script>
+
 <template>
   <div class="contact-card shadowed">
     <div class="contact-heading">
@@ -33,33 +60,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from 'vue'
-
-const props = defineProps({
-  name: String,
-  email: String,
-  phone: String,
-  avatar: String,
-  instagram: String,
-  facebook: String,
-  snapchat: String,
-})
-
-// Computed property to format the phone number
-const formattedPhone = computed(() => {
-  if (!props.phone) return ''
-  // Remove any non-digit characters
-  const digits = props.phone.replace(/\D/g, '')
-  // Format as (xxx) xxx-xxxx
-  if (digits.length >= 10) {
-    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
-  }
-  // Return original if not enough digits
-  return props.phone
-})
-</script>
 
 <style lang="scss" scoped>
 .contact-card {
@@ -98,12 +98,15 @@ const formattedPhone = computed(() => {
   list-style-type: none;
   display: flex;
   gap: 10px;
+  .icon {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: all 0.4s;
+  }
   a {
     text-decoration: none;
     &:hover {
-      .icon {
-        transition: all 0.4s;
-      }
       .icon-facebook {
         color: #1877f2;
       }

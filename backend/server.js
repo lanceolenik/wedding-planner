@@ -1,7 +1,7 @@
 import express from 'express'
 import compression from 'compression'
 import mongoose from 'mongoose'
-import { setupMiddleware, authenticateToken } from './middleware.js' // Assuming authenticateToken is also used somewhere, even if not in this snippet
+import { setupMiddleware } from './middleware.js'
 import { config } from './config.js'
 import axios from 'axios'
 import { Rsvp } from './models/rsvp.js'
