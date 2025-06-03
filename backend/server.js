@@ -5,12 +5,34 @@ import { setupMiddleware } from './middleware.js'
 import { config } from './config.js'
 import axios from 'axios'
 import { Rsvp } from './models/rsvp.js'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+// Define __dirname for ESM
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Define base path for API routes (relative path)
-const apiBasePath = '/api'
+const isProduction = process.env.NODE_ENV === 'production'
+const apiBasePath = isProduction ? '/wedding/api' : '/api'
 
 // Initialize Express app
 const app = express()
+
+// Determine log file path based on environment
+const logDir = isProduction ? '/home/lanczklo/wedding_api/logs' : path.join(__dirname, 'logs')
+const logFile = path.join(logDir, 'startup.log')
+const log = (message) => {
+  if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true })
+  fs.appendFileSync(logFile, `${new Date().toISOString()} - ${message}\n`)
+}
+
+// Log all incoming requests
+app.use((req, res, next) => {
+  log(`Incoming request: ${req.url} (Original: ${req.originalUrl})`)
+  next()
+})
 
 // Set up middleware
 setupMiddleware(app)
@@ -21,19 +43,19 @@ mongoose
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
   })
-  .then(() => console.log('✅ MongoDB Connected'))
-  .catch((err) => console.error('❌ MongoDB Connection Error:', err))
+  .then(() => log('✅ MongoDB Connected'))
+  .catch((err) => log(`❌ MongoDB Connection Error: ${err.message}`))
 
 // Create unique index on email for Rsvp collection
 Rsvp.collection.createIndex({ email: 1 }, { unique: true }, (err) => {
   if (err) {
-    console.error('❌ Error creating unique index on email for rsvps:', err.message)
+    log(`❌ Error creating unique index on email for rsvps: ${err.message}`)
   } else {
-    console.log('✅ Unique index on email created for rsvps collection')
+    log('✅ Unique index on email created for rsvps collection')
   }
 })
 
-// Proxy endpoint for Google Maps API
+// Proxy endpoint for Google Places API
 app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
@@ -44,16 +66,18 @@ app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
     })
     if (response.data.status !== 'OK') {
-      console.warn('Google Places response:', response.data)
+      log(`Google Places warning: ${JSON.stringify(response.data)}`)
     }
     res.json(response.data)
   } catch (err) {
-    console.error('Google API proxy error:', {
-      message: err.message,
-      response: err.response?.data,
-      status: err.response?.status,
-      axiosError: err.toJSON?.() || err,
-    })
+    log(
+      `Google Places proxy error: ${JSON.stringify({
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        query: req.query,
+      })}`,
+    )
     res.status(err.response?.status || 500).json({
       error: 'Failed to fetch Google API data',
       details: err.response?.data || err.message,
@@ -69,20 +93,21 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
     const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
     })
-    console.log('Google Geocode Response:', response.data) // Log for debugging
+    log(`Google Geocode Response for ${req.query.address}: ${JSON.stringify(response.data)}`)
     if (response.data.status !== 'OK') {
-      console.warn('Google Geocode warning:', response.data)
-      return res.status(400).json(response.data) // Return Google’s error response
+      log(`Google Geocode warning: ${JSON.stringify(response.data)}`)
+      return res.status(400).json(response.data)
     }
     res.json(response.data)
   } catch (err) {
-    console.error('Google Geocode proxy error:', {
-      message: err.message,
-      response: err.response?.data,
-      status: err.response?.status,
-      axiosError: err.toJSON?.() || err,
-      query: req.query,
-    })
+    log(
+      `Google Geocode proxy error: ${JSON.stringify({
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        query: req.query,
+      })}`,
+    )
     res.status(err.response?.status || 500).json({
       error: 'Failed to fetch geocode data',
       details: err.response?.data || err.message,
@@ -90,7 +115,7 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   }
 })
 
-// Import and mount routes (these will now be checked AFTER your specific Google proxy routes)
+// Import and mount routes
 import authRoutes from './routes/auth.js'
 import adminRoutes from './routes/admin.js'
 import invitesRoutes from './routes/invites.js'
@@ -98,16 +123,16 @@ import contactRoutes from './routes/contact.js'
 import helpRoutes from './routes/help.js'
 import rsvpRoutes from './routes/rsvp.js'
 
-app.use('/api', authRoutes)
-app.use('/api/admin', adminRoutes)
-app.use('/api/invites', invitesRoutes)
-app.use('/api/contact', contactRoutes)
-app.use('/api/help', helpRoutes)
-app.use('/api/rsvp', rsvpRoutes)
+app.use(apiBasePath, authRoutes)
+app.use(`${apiBasePath}/admin`, adminRoutes)
+app.use(`${apiBasePath}/invites`, invitesRoutes)
+app.use(`${apiBasePath}/contact`, contactRoutes)
+app.use(`${apiBasePath}/help`, helpRoutes)
+app.use(`${apiBasePath}/rsvp`, rsvpRoutes)
 
 app.use(compression())
 
 // Start HTTP Server
 app.listen(config.PORT, () => {
-  console.log(`🚀 Server running at: ${config.PORT}`)
+  log(`🚀 Server running on port ${config.PORT}`)
 })

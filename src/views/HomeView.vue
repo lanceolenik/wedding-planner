@@ -30,7 +30,7 @@ const clearRSVP = () => {
     <header class="home-header">
       <h1>Gracie & Michael</h1>
       <h2>She said yes!</h2>
-      <p>June 6, 2026 at 2:00 PM | Really Cool Venue</p>
+      <p><!--June 6, 2026 at 2:00 PM | Really Cool Venue--></p>
       <div class="rsvp-button-wrapper">
         <!--HIDE UNTIL READY:<button v-if="!rsvpConfirmed" @click="showForm = true" class="rsvp-btn">
           <i class="icon-checkbox"></i> RSVP Now
