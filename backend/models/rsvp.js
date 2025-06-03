@@ -1,14 +1,16 @@
 import mongoose from 'mongoose'
 
-const RSVPSchema = new mongoose.Schema({
+const rsvpSchema = new mongoose.Schema({
   name: String,
-  email: String,
+  email: { type: String, required: true, unique: true },
   phone: String,
-  attending: String,
+  guestOf: String,
   plusOne: String,
   children: Number,
+  attending: String,
   dateTime: String,
-  guestOf: String,
 })
 
-export const Rsvp = mongoose.model('Rsvp', RSVPSchema)
+const Rsvp = mongoose.model('Rsvp', rsvpSchema)
+
+export { Rsvp }

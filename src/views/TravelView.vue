@@ -37,7 +37,9 @@ const getCacheItem = (key) => {
 
 // Define range of zip codes
 const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+const isProduction = import.meta.env.MODE === 'production'
+const basePath = isProduction ? '/wedding/api' : '/api'
+const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath
 const hotels = ref([])
 const parks = ref([])
 const museumsZoos = ref([])
@@ -55,7 +57,7 @@ const fallbackLocation = { lat: 43.4917, lng: -112.033 }
 // Geocode a single zip code to lat/lng
 const geocodeZip = async (zip) => {
   try {
-    const response = await axios.get(`${apiUrl}/api/google-geocode`, {
+    const response = await axios.get(`${apiUrl}/google-geocode`, {
       params: { address: zip },
     })
     if (response.data.status !== 'OK' || !response.data.results?.[0]) {
@@ -80,18 +82,16 @@ const fetchHotels = async (locations) => {
   hotelsLoading.value = true
   try {
     const hotelsCacheKey = `hotels_${zipCodes.join('-')}`
-    // Use getCacheItem
-    const hotelsCachedData = getCacheItem(hotelsCacheKey) // This will be null if expired or not found
+    const hotelsCachedData = getCacheItem(hotelsCacheKey)
     if (hotelsCachedData) {
       hotels.value = hotelsCachedData
-      return // Exit if valid cache found
+      return
     }
 
-    // Proceed with API call if no valid cache
     const allHotels = []
     for (const location of locations) {
       if (location) {
-        const response = await axios.get(`${apiUrl}/api/google-places/nearbysearch/json`, {
+        const response = await axios.get(`${apiUrl}/google-places/nearbysearch/json`, {
           params: {
             location: `${location.lat},${location.lng}`,
             radius: 20000,
@@ -121,8 +121,7 @@ const fetchHotels = async (locations) => {
           `https://www.google.com/search?q=${encodeURIComponent(place.name + ' Idaho Falls')}`,
       }))
     hotels.value = filteredHotels
-    // Use setCacheItem with expiration
-    setCacheItem(hotelsCacheKey, filteredHotels, 7) // Cache for 7 days
+    setCacheItem(hotelsCacheKey, filteredHotels, 7)
   } catch (err) {
     console.error('Hotels fetch error:', {
       message: err.message,
@@ -138,14 +137,12 @@ const fetchHotels = async (locations) => {
 
 // Fetch entertainment options for multiple locations
 const fetchEntertainment = async (locations) => {
-  console.log(locations)
   parksLoading.value = true
   museumsZoosLoading.value = true
   otherEntertainmentLoading.value = true
   try {
     const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
-    // Use getCacheItem
-    const entertainmentCachedData = getCacheItem(entertainmentCacheKey) // This will be null if expired or not found
+    const entertainmentCachedData = getCacheItem(entertainmentCacheKey)
     if (entertainmentCachedData) {
       const {
         parks: cachedParks,
@@ -155,14 +152,12 @@ const fetchEntertainment = async (locations) => {
       parks.value = cachedParks
       museumsZoos.value = cachedMuseumsZoos
       otherEntertainment.value = cachedOtherEntertainment
-      // Set loading states to false immediately if loaded from cache
       parksLoading.value = false
       museumsZoosLoading.value = false
       otherEntertainmentLoading.value = false
-      return // Exit if valid cache found
+      return
     }
 
-    // Proceed with API call if no valid cache
     const parkTypes = ['park']
     const museumZooTypes = ['museum', 'zoo']
     const otherTypes = ['theater', 'bowling_alley']
@@ -187,7 +182,7 @@ const fetchEntertainment = async (locations) => {
       for (const location of locations) {
         if (location) {
           for (const type of typeArray) {
-            const response = await axios.get(`${apiUrl}/api/google-places/nearbysearch/json`, {
+            const response = await axios.get(`${apiUrl}/google-places/nearbysearch/json`, {
               params: {
                 location: `${location.lat},${location.lng}`,
                 radius: 20000,
@@ -198,7 +193,7 @@ const fetchEntertainment = async (locations) => {
               console.warn(
                 `${type} fetch warning: ${response.data.status}, error: ${response.data.error_message || 'Unknown'}`,
               )
-              continue // Skip invalid responses instead of throwing
+              continue
             }
             allResults.push(...(response.data.results || []).filter(filterPlaces))
           }
@@ -225,7 +220,6 @@ const fetchEntertainment = async (locations) => {
     museumsZoos.value = fetchedMuseumsZoos
     otherEntertainment.value = fetchedOtherEntertainment
 
-    // Use setCacheItem with expiration
     setCacheItem(
       entertainmentCacheKey,
       {
@@ -233,7 +227,7 @@ const fetchEntertainment = async (locations) => {
         museumsZoos: fetchedMuseumsZoos,
         otherEntertainment: fetchedOtherEntertainment,
       },
-      7, // Cache for 7 days
+      7,
     )
   } catch (err) {
     console.error('Entertainment fetch error:', {
@@ -257,14 +251,12 @@ onMounted(async () => {
   const hotelsCacheKey = `hotels_${zipCodes.join('-')}`
   const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
 
-  // Check cache for hotels using getCacheItem
   const hotelCachedData = getCacheItem(hotelsCacheKey)
   if (hotelCachedData) {
     hotels.value = hotelCachedData
-    hotelsLoading.value = false // Turn off loading if cached
+    hotelsLoading.value = false
   }
 
-  // Check cache for entertainment using getCacheItem
   const entertainmentCachedData = getCacheItem(entertainmentCacheKey)
   if (entertainmentCachedData) {
     const {
@@ -275,12 +267,11 @@ onMounted(async () => {
     parks.value = cachedParks
     museumsZoos.value = cachedMuseumsZoos
     otherEntertainment.value = cachedOtherEntertainment
-    parksLoading.value = false // Turn off loading if cached
+    parksLoading.value = false
     museumsZoosLoading.value = false
     otherEntertainmentLoading.value = false
   }
 
-  // Only proceed with API calls if any cache is NOT valid
   if (!hotelCachedData || !entertainmentCachedData) {
     const locations = await Promise.all(zipCodes.map((zip) => geocodeZip(zip)))
     const validLocations = locations.filter((loc) => loc !== null)

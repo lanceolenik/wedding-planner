@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer'
 import fs from 'fs/promises'
 import { config } from './config.js'
+import { Rsvp } from './models/rsvp.js'
 
 const transporter = nodemailer.createTransport({
   host: config.EMAIL_HOST,
@@ -24,7 +25,7 @@ export const syncRsvpsToGuests = async () => {
       guests = []
     }
 
-    const rsvps = await (await import('./models/rsvp.js')).Rsvp.find().lean()
+    const rsvps = await Rsvp.find().lean()
     console.log('✅ Fetched RSVPs:', rsvps.length)
 
     const guestMap = guests.reduce((map, guest) => {
