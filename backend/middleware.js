@@ -1,9 +1,9 @@
-import cors from 'cors'
-import express from 'express'
-import jwt from 'jsonwebtoken'
-import { config } from './config.js'
+const cors = require('cors')
+const express = require('express')
+const jwt = require('jsonwebtoken')
+const config = require('./config.js')
 
-export const setupMiddleware = (app) => {
+const setupMiddleware = (app) => {
   app.use(
     cors({
       origin: [
@@ -11,7 +11,7 @@ export const setupMiddleware = (app) => {
         'https://localhost:5173',
         'https://localhost:5001',
         'http://localhost:5001',
-        'https://oleniks.net/wedding', // update in production
+        'https://oleniks.net/wedding',
       ],
       methods: 'GET,POST,PUT,DELETE,OPTIONS',
       allowedHeaders: ['Content-Type', 'Authorization'],
@@ -22,7 +22,7 @@ export const setupMiddleware = (app) => {
   app.use(express.json())
 }
 
-export const authenticateToken = (req, res, next) => {
+const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
   if (!token) return res.status(401).json({ error: 'Access denied, no token provided' })
@@ -35,3 +35,5 @@ export const authenticateToken = (req, res, next) => {
     res.status(403).json({ error: 'Invalid token' })
   }
 }
+
+module.exports = { setupMiddleware, authenticateToken }

@@ -34,7 +34,10 @@ const isLogin = ref(true)
 const form = ref({ username: '', password: '' })
 const error = ref('')
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+const isProduction = import.meta.env.MODE === 'production'
+const basePath = isProduction ? '/wedding' : ''
+const apiPath = isProduction ? '/api' : '/api' // Adjust base API path
+const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath + apiPath
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value

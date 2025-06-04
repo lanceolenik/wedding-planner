@@ -1,6 +1,6 @@
-import { Router } from 'express'
-import { Contact } from '../models/contact.js'
-import { sendContactEmails } from '../utils.js'
+const { Router } = require('express')
+const { Contact } = require('../models/contact.js')
+const { sendContactEmails } = require('../utils.js')
 
 const router = Router()
 
@@ -20,4 +20,4 @@ router.post('/', async (req, res) => {
   }
 })
 
-export default router
+module.exports = router

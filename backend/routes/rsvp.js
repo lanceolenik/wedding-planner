@@ -1,7 +1,6 @@
-import { Router } from 'express'
-import { Rsvp } from '../models/rsvp.js'
-import { sendRsvpEmails, isValidEmail } from '../utils.js'
-import { syncRsvpsToGuests } from '../utils.js'
+const { Router } = require('express')
+const { Rsvp } = require('../models/rsvp.js')
+const { sendRsvpEmails, isValidEmail, syncRsvpsToGuests } = require('../utils.js')
 
 const router = Router()
 
@@ -95,4 +94,4 @@ router.post('/', async (req, res) => {
   }
 })
 
-export default router
+module.exports = router
