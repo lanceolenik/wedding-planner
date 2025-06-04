@@ -7,13 +7,15 @@
         <p>...</p>
         <h2>A Visual Story</h2>
         <SlideShow
-          design-id="DAGolM-yMqg/YOBrZOwj5ePlQbDzKyg0Eg"
+          source="canva"
+          src-id="DAGolM-yMqg/YOBrZOwj5ePlQbDzKyg0Eg"
           link-text="Gracie & Michael - A Visual Story"
         />
         <h2>The Proposal</h2>
         <SlideShow
-          design-id="DAGolM-yMqg/YOBrZOwj5ePlQbDzKyg0Eg"
-          link-text="Gracie & Michael - A Visual Story"
+          source="canva"
+          src-id="DAGpVEevkdo/37m-gC4p7pXf1BxjbVuUVA"
+          link-text="Gracie & Michael - The Proposal"
         />
       </div>
     </div>

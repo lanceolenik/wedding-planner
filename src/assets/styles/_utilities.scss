@@ -14,12 +14,19 @@
   max-width: 1024px;
   margin: 0 auto;
   padding-bottom: 30px;
+  @media (max-width: 767px) {
+    padding-bottom: 100px;
+  }
 }
 .shadowed {
   padding: 20px;
   background: var(--color-background-opaque);
   border-radius: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  @media (max-width: 767px) {
+    padding: 10px;
+    border-radius: 10px;
+  }
 }
 .shadowed.--notransparency {
   background: var(--color-background);
