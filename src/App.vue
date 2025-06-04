@@ -60,26 +60,26 @@ onBeforeUnmount(() => {
             class="icon wedding-icons icon-Book-Heart--Streamline-Lucide-converted"
             title="Our Story"
           ></i>
-          <span class="nav-label">Our Story</span>
+          <span class="nav-label"><span class="hide-on-mobile">Our </span>Story</span>
         </RouterLink>
         <RouterLink to="/wedding">
           <i
             class="icon wedding-icons icon-Wedding-Couple--Streamline-Ultimate-converted"
             title="The Wedding"
           ></i>
-          <span class="nav-label">The Wedding</span>
+          <span class="nav-label"><span class="hide-on-mobile">The </span>Wedding</span>
         </RouterLink>
         <RouterLink to="/help">
           <i class="icon wedding-icons icon-lifebuoy" title="Help Out"></i>
-          <span class="nav-label">Help Out</span>
+          <span class="nav-label">Help<span class="hide-on-mobile"> Out</span></span>
         </RouterLink>
         <RouterLink to="/travel">
           <i class="icon wedding-icons icon-plane" title="Travel Info"></i>
-          <span class="nav-label">Travel Info</span>
+          <span class="nav-label">Travel<span class="hide-on-mobile"> Info</span></span>
         </RouterLink>
         <RouterLink to="/contact">
           <i class="icon wedding-icons icon-old-phone" title="Contact Us"></i>
-          <span class="nav-label">Contact Us</span>
+          <span class="nav-label">Contact<span class="hide-on-mobile"> Us</span></span>
         </RouterLink>
       </nav>
     </header>
@@ -162,9 +162,18 @@ header {
         transform: translateX(-50%);
         margin-top: 2px;
       }
+      @media (max-width: 767px) {
+        font-size: 11px;
+        .hide-on-mobile {
+          display: none;
+        }
+      }
     }
     i {
       font-size: 22px;
+      @media (max-width: 767px) {
+        font-size: 28px;
+      }
     }
     &.router-link-exact-active {
       color: var(--color-nav-active);
@@ -207,8 +216,8 @@ header {
       a {
         flex-grow: 1;
         justify-content: center;
-        flex-direction: column-reverse;
-        gap: 5px;
+        flex-direction: column;
+        gap: 8px;
         padding: 0.5rem 0;
         width: calc(100% / 6);
         .nav-label {
