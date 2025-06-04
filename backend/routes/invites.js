@@ -1,8 +1,9 @@
-import { Router } from 'express'
-import { Rsvp } from '../models/rsvp.js'
-import { authenticateToken } from '../middleware.js'
-import { syncRsvpsToGuests } from '../utils.js'
-import fs from 'fs/promises'
+const { Router } = require('express')
+const { Rsvp } = require('../models/rsvp.js')
+const { authenticateToken } = require('../middleware.js')
+const { syncRsvpsToGuests, sendRsvpEmails } = require('../utils.js')
+const fs = require('fs/promises')
+const config = require('../config.js') // Already updated
 
 const router = Router()
 
@@ -57,11 +58,11 @@ router.post('/', authenticateToken, async (req, res) => {
   try {
     let guests = []
     try {
-      const data = await fs.readFile(GUESTS_FILE, 'utf8')
+      const data = await fs.readFile(config.GUESTS_FILE, 'utf8')
       guests = JSON.parse(data)
     } catch (err) {
       if (err.code !== 'ENOENT') throw err
-      await fs.writeFile(GUESTS_FILE, JSON.stringify([]))
+      await fs.writeFile(config.GUESTS_FILE, JSON.stringify([]))
     }
 
     const normalizedEmail = email.toLowerCase()
@@ -101,7 +102,7 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     guests.push(newGuest)
-    await fs.writeFile(GUESTS_FILE, JSON.stringify(guests, null, 2))
+    await fs.writeFile(config.GUESTS_FILE, JSON.stringify(guests, null, 2))
 
     await syncRsvpsToGuests()
 
@@ -167,11 +168,11 @@ router.put('/:id', authenticateToken, async (req, res) => {
   try {
     let guests = []
     try {
-      const data = await fs.readFile(GUESTS_FILE, 'utf8')
+      const data = await fs.readFile(config.GUESTS_FILE, 'utf8')
       guests = JSON.parse(data)
     } catch (err) {
       if (err.code !== 'ENOENT') throw err
-      await fs.writeFile(GUESTS_FILE, JSON.stringify([]))
+      await fs.writeFile(config.GUESTS_FILE, JSON.stringify([]))
     }
 
     const guestIndex = guests.findIndex((guest) => guest.id === parseInt(id))
@@ -280,7 +281,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     guests[guestIndex] = updatedGuest
-    await fs.writeFile(GUESTS_FILE, JSON.stringify(guests, null, 2))
+    await fs.writeFile(config.GUESTS_FILE, JSON.stringify(guests, null, 2))
 
     await syncRsvpsToGuests()
 
@@ -340,7 +341,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
         }
 
         guests[guestIndex] = updatedGuest
-        await fs.writeFile(GUESTS_FILE, JSON.stringify(guests, null, 2))
+        await fs.writeFile(config.GUESTS_FILE, JSON.stringify(guests, null, 2))
 
         await syncRsvpsToGuests()
 
@@ -365,11 +366,11 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     let guests = []
     try {
-      const data = await fs.readFile(GUESTS_FILE, 'utf8')
+      const data = await fs.readFile(config.GUESTS_FILE, 'utf8')
       guests = JSON.parse(data)
     } catch (err) {
       if (err.code !== 'ENOENT') throw err
-      await fs.writeFile(GUESTS_FILE, JSON.stringify([]))
+      await fs.writeFile(config.GUESTS_FILE, JSON.stringify([]))
     }
 
     const guestIndex = guests.findIndex((guest) => guest.id === parseInt(id))
@@ -380,7 +381,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const guestEmail = guests[guestIndex].email.toLowerCase()
     await Rsvp.deleteOne({ email: guestEmail })
     guests.splice(guestIndex, 1)
-    await fs.writeFile(GUESTS_FILE, JSON.stringify(guests, null, 2))
+    await fs.writeFile(config.GUESTS_FILE, JSON.stringify(guests, null, 2))
 
     res.status(200).json({ success: true, message: 'Guest deleted successfully' })
   } catch (error) {
@@ -389,4 +390,4 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 })
 
-export default router
+module.exports = router
