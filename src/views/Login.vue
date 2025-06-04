@@ -34,7 +34,6 @@ const isLogin = ref(true)
 const form = ref({ username: '', password: '' })
 const error = ref('')
 
-const isProduction = import.meta.env.MODE === 'production'
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 const toggleMode = () => {

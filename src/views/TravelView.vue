@@ -40,6 +40,7 @@ const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
 const isProduction = import.meta.env.MODE === 'production'
 console.log('isProduction', isProduction)
 const basePath = isProduction ? '/wedding/api' : '/api'
+//const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath
 const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath
 const hotels = ref([])
 const parks = ref([])
