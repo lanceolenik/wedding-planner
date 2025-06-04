@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Define base path for API routes (relative path)
+// Define base path for API routes based on environment
 const isProduction = process.env.NODE_ENV === 'production'
 const apiBasePath = isProduction ? '/wedding/api' : '/api'
 
@@ -36,6 +36,11 @@ app.use((req, res, next) => {
 
 // Set up middleware
 setupMiddleware(app)
+
+// Health check endpoint
+app.get(`${apiBasePath}/health`, (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' })
+})
 
 // MongoDB Connection
 mongoose
@@ -88,10 +93,16 @@ app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
 app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
+      log('Google Geocode error: API key not configured')
       return res.status(500).json({ error: 'Google API key not configured' })
+    }
+    if (!req.query.address) {
+      log('Google Geocode error: Address parameter missing')
+      return res.status(400).json({ error: 'Address parameter is required' })
     }
     const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
+      timeout: 5000, // Add timeout to prevent hanging
     })
     log(`Google Geocode Response for ${req.query.address}: ${JSON.stringify(response.data)}`)
     if (response.data.status !== 'OK') {
@@ -106,6 +117,7 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
         response: err.response?.data,
         status: err.response?.status,
         query: req.query,
+        stack: err.stack,
       })}`,
     )
     res.status(err.response?.status || 500).json({
