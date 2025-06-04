@@ -1,6 +1,6 @@
-import { Router } from 'express'
-import { Help } from '../models/help.js'
-import { sendHelpEmails } from '../utils.js'
+const { Router } = require('express')
+const { Help } = require('../models/help.js')
+const { sendHelpEmails } = require('../utils.js')
 
 const router = Router()
 
@@ -21,4 +21,4 @@ router.post('/', async (req, res) => {
   }
 })
 
-export default router
+module.exports = router
