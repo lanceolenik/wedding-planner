@@ -35,9 +35,9 @@
   }
   @media (max-width: 767px) {
     position: fixed;
-    bottom: 60px;
-    right: 0;
-    padding: 5px 0;
+    bottom: 120px;
+    right: -2px;
+    padding: 0;
     writing-mode: vertical-rl;
     text-orientation: mixed;
     .loko {
