@@ -2,11 +2,11 @@
   <div class="table-wrapper" data-printing="help">
     <h3>
       Help Offers
-      <button class="print" @click="printTable">
+      <button v-if="helpEntries.length" class="print" @click="printTable">
         <i aria-label="Print" class="icon-local_printshop"></i>
       </button>
     </h3>
-    <table>
+    <table v-if="helpEntries.length">
       <thead>
         <tr>
           <th>Name</th>
@@ -43,6 +43,7 @@
         </tr>
       </tbody>
     </table>
+    <p v-else><em>There are no offers to help.</em></p>
   </div>
 </template>
 
@@ -84,6 +85,9 @@ h3 {
   font-size: 20px;
   display: flex;
   justify-content: space-between;
+  + p {
+    margin-top: 0;
+  }
 }
 td[data-label='Name'],
 td[data-label='Phone'] {

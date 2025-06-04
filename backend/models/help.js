@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const HelpSchema = new mongoose.Schema({
   name: String,
@@ -10,4 +10,6 @@ const HelpSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
 })
 
-export const Help = mongoose.model('Help', HelpSchema)
+const Help = mongoose.model('Help', HelpSchema)
+
+module.exports = { Help }

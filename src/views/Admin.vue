@@ -44,7 +44,7 @@ const username = ref('')
 const error = ref('')
 const printingTable = ref(null)
 
-const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
+const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + '/api'
 
 const fetchData = async () => {
   try {
@@ -55,10 +55,10 @@ const fetchData = async () => {
     const config = { headers: { Authorization: `Bearer ${token}` } }
 
     const [userRes, contactsRes, helpRes, rsvpsRes] = await Promise.all([
-      axios.get(`${apiUrl}/api/admin/user`, config),
-      axios.get(`${apiUrl}/api/admin/contacts`, config),
-      axios.get(`${apiUrl}/api/admin/help`, config),
-      axios.get(`${apiUrl}/api/admin/rsvps`, config),
+      axios.get(`${apiUrl}/admin/user`, config), // Remove extra /api
+      axios.get(`${apiUrl}/admin/contacts`, config),
+      axios.get(`${apiUrl}/admin/help`, config),
+      axios.get(`${apiUrl}/admin/rsvps`, config),
     ])
 
     username.value = userRes.data.username || 'n/a'

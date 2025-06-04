@@ -3,15 +3,15 @@
     <h3>
       RSVPs
       <div>
-        <button class="print" @click="printTable">
+        <button class="print" @click="printTable" v-if="sortedRsvps.length">
           <i aria-label="Print" class="icon-local_printshop"></i>
         </button>
-        <a class="has-icon" href="/invites"
+        <a class="has-icon" href="/invites" v-if="sortedRsvps.length"
           ><i class="icon-settings" title="Manage Invites/RSVPs"></i
         ></a>
       </div>
     </h3>
-    <table>
+    <table v-if="sortedRsvps.length">
       <thead>
         <tr>
           <th
@@ -77,6 +77,7 @@
         </tr>
       </tbody>
     </table>
+    <p v-else><em>There are no RSVPs yet.</em></p>
   </div>
 </template>
 
@@ -173,6 +174,9 @@ h3 {
   font-size: 20px;
   display: flex;
   justify-content: space-between;
+  + p {
+    margin-top: 0;
+  }
 }
 .print {
   background: transparent;

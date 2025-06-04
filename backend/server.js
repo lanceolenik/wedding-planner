@@ -1,19 +1,14 @@
-import express from 'express'
-import compression from 'compression'
-import mongoose from 'mongoose'
-import { setupMiddleware } from './middleware.js'
-import { config } from './config.js'
-import axios from 'axios'
-import { Rsvp } from './models/rsvp.js'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+const express = require('express')
+const compression = require('compression')
+const mongoose = require('mongoose')
+const { setupMiddleware } = require('./middleware.js')
+const config = require('./config.js') // Updated
+const axios = require('axios')
+const { Rsvp } = require('./models/rsvp.js')
+const fs = require('fs')
+const path = require('path')
 
-// Define __dirname for ESM
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Define base path for API routes (relative path)
+// Define base path for API routes based on environment
 const isProduction = process.env.NODE_ENV === 'production'
 const apiBasePath = isProduction ? '/wedding/api' : '/api'
 
@@ -28,6 +23,9 @@ const log = (message) => {
   fs.appendFileSync(logFile, `${new Date().toISOString()} - ${message}\n`)
 }
 
+// Log app startup
+log('🚀 Node.js app starting...')
+
 // Log all incoming requests
 app.use((req, res, next) => {
   log(`Incoming request: ${req.url} (Original: ${req.originalUrl})`)
@@ -36,6 +34,12 @@ app.use((req, res, next) => {
 
 // Set up middleware
 setupMiddleware(app)
+
+// Health check endpoint
+app.get(`${apiBasePath}/health`, (req, res) => {
+  log('Health check requested')
+  res.status(200).json({ status: 'OK', message: 'Server is running' })
+})
 
 // MongoDB Connection
 mongoose
@@ -88,10 +92,16 @@ app.get(`${apiBasePath}/google-places/*`, async (req, res) => {
 app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
   try {
     if (!config.GOOGLE_API_KEY) {
+      log('Google Geocode error: API key not configured')
       return res.status(500).json({ error: 'Google API key not configured' })
+    }
+    if (!req.query.address) {
+      log('Google Geocode error: Address parameter missing')
+      return res.status(400).json({ error: 'Address parameter is required' })
     }
     const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
       params: { ...req.query, key: config.GOOGLE_API_KEY },
+      timeout: 5000,
     })
     log(`Google Geocode Response for ${req.query.address}: ${JSON.stringify(response.data)}`)
     if (response.data.status !== 'OK') {
@@ -106,6 +116,7 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
         response: err.response?.data,
         status: err.response?.status,
         query: req.query,
+        stack: err.stack,
       })}`,
     )
     res.status(err.response?.status || 500).json({
@@ -116,12 +127,12 @@ app.get(`${apiBasePath}/google-geocode`, async (req, res) => {
 })
 
 // Import and mount routes
-import authRoutes from './routes/auth.js'
-import adminRoutes from './routes/admin.js'
-import invitesRoutes from './routes/invites.js'
-import contactRoutes from './routes/contact.js'
-import helpRoutes from './routes/help.js'
-import rsvpRoutes from './routes/rsvp.js'
+const authRoutes = require('./routes/auth.js')
+const adminRoutes = require('./routes/admin.js')
+const invitesRoutes = require('./routes/invites.js')
+const contactRoutes = require('./routes/contact.js')
+const helpRoutes = require('./routes/help.js')
+const rsvpRoutes = require('./routes/rsvp.js')
 
 app.use(apiBasePath, authRoutes)
 app.use(`${apiBasePath}/admin`, adminRoutes)

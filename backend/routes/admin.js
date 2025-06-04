@@ -1,9 +1,9 @@
-import { Router } from 'express'
-import { Contact } from '../models/contact.js'
-import { Help } from '../models/help.js'
-import { Rsvp } from '../models/rsvp.js'
-import { authenticateToken } from '../middleware.js'
-import { User } from '../models/user.js'
+const { Router } = require('express')
+const { Contact } = require('../models/contact.js')
+const { Help } = require('../models/help.js')
+const { Rsvp } = require('../models/rsvp.js')
+const { authenticateToken } = require('../middleware.js')
+const { User } = require('../models/user.js')
 
 const router = Router()
 
@@ -50,4 +50,4 @@ router.get('/rsvps', authenticateToken, async (req, res) => {
   }
 })
 
-export default router
+module.exports = router
