@@ -36,7 +36,7 @@ const error = ref('')
 
 const isProduction = import.meta.env.MODE === 'production'
 const basePath = isProduction ? '/wedding' : ''
-const apiPath = isProduction ? '/api' : '/api' // Adjust base API path
+const apiPath = isProduction ? '/api' : '/api'; // Adjust base API path
 const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath + apiPath
 
 const toggleMode = () => {
