@@ -1,7 +1,7 @@
-import nodemailer from 'nodemailer'
-import fs from 'fs/promises'
-import { config } from './config.js'
-import { Rsvp } from './models/rsvp.js'
+const nodemailer = require('nodemailer')
+const fs = require('fs/promises')
+const config = require('./config.js') // Updated
+const { Rsvp } = require('./models/rsvp.js')
 
 const transporter = nodemailer.createTransport({
   host: config.EMAIL_HOST,
@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-export const syncRsvpsToGuests = async () => {
+const syncRsvpsToGuests = async () => {
   try {
     let guests = []
     try {
@@ -91,7 +91,7 @@ export const syncRsvpsToGuests = async () => {
   }
 }
 
-export const formatAreas = (areasString) => {
+const formatAreas = (areasString) => {
   return areasString
     .split(',')
     .map((a) => a.replace(/_/g, ' '))
@@ -99,7 +99,7 @@ export const formatAreas = (areasString) => {
     .join(', ')
 }
 
-export const sendContactEmails = async (name, email, message) => {
+const sendContactEmails = async (name, email, message) => {
   try {
     await transporter.sendMail({
       from: `"The Wedding Planner" <${config.EMAIL_USER}>`,
@@ -119,7 +119,7 @@ export const sendContactEmails = async (name, email, message) => {
   }
 }
 
-export const sendHelpEmails = async (name, phone, email, helpAreas, proAreas, message) => {
+const sendHelpEmails = async (name, phone, email, helpAreas, proAreas, message) => {
   try {
     const formattedHelpAreas = formatAreas(helpAreas)
     const formattedProAreas = formatAreas(proAreas)
@@ -141,15 +141,7 @@ export const sendHelpEmails = async (name, phone, email, helpAreas, proAreas, me
   }
 }
 
-export const sendRsvpEmails = async (
-  name,
-  email,
-  phone,
-  attending,
-  plusOne,
-  children,
-  dateTime,
-) => {
+const sendRsvpEmails = async (name, email, phone, attending, plusOne, children, dateTime) => {
   try {
     if (!isValidEmail(email)) {
       console.warn(`⚠️ Skipping email to invalid user address: ${email}`)
@@ -181,7 +173,16 @@ export const sendRsvpEmails = async (
   }
 }
 
-export const isValidEmail = (email) => {
+const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
+}
+
+module.exports = {
+  syncRsvpsToGuests,
+  formatAreas,
+  sendContactEmails,
+  sendHelpEmails,
+  sendRsvpEmails,
+  isValidEmail,
 }
