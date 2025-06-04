@@ -34,7 +34,8 @@ const isLogin = ref(true)
 const form = ref({ username: '', password: '' })
 const error = ref('')
 
-const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+const isProduction = import.meta.env.MODE === 'production'
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value
@@ -44,9 +45,8 @@ const toggleMode = () => {
 
 const handleSubmit = async () => {
   try {
-    const endpoint = isLogin.value ? '/api/login' : '/api/register'
+    const endpoint = isLogin.value ? '/login' : '/register' // Remove extra /api
     const response = await axios.post(`${apiUrl}${endpoint}`, form.value)
-
     if (isLogin.value) {
       localStorage.setItem('token', response.data.token)
       router.push('/admin')
