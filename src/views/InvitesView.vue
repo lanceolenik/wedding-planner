@@ -101,7 +101,7 @@
       <p v-else>No guests match the selected filter.</p>
       <hr class="hide-on-print" />
       <!-- Add/Edit Guest Form -->
-      <div class="hide-on-print">
+      <div class="guest-form-wrapper hide-on-print">
         <h2>{{ isEditing ? 'Edit Guest' : 'Add Guest' }}</h2>
         <form @submit.prevent="submitForm" class="guest-form">
           <div class="guest-form-fields">
@@ -466,23 +466,6 @@ const resetForm = () => {
   editingId.value = null
 }
 
-const formatDate = (isoString) => {
-  if (!isoString) return '-'
-  const date = new Date(isoString)
-  if (isNaN(date.getTime())) return '-'
-  return date
-    .toLocaleString('en-US', {
-      month: 'numeric',
-      day: 'numeric',
-      year: '2-digit',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
-    .replace(',', '')
-    .replace(/ AM| PM/, (match) => match.toLowerCase())
-}
-
 onMounted(fetchData)
 </script>
 
@@ -516,6 +499,7 @@ onMounted(fetchData)
   p {
     margin-top: 0;
   }
+  .guest-form-wrapper,
   .guest-form {
     width: 100%;
   }
@@ -523,11 +507,11 @@ onMounted(fetchData)
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    column-gap: 30px;
-    row-gap: 10px;
+    grid-column-gap: 30px;
+    grid-row-gap: 10px;
     @media (max-width: 767px) {
       grid-template-columns: 1fr 1fr;
-      column-gap: 10px;
+      grid-column-gap: 10px;
     }
     @media (max-width: 400px) {
       grid-template-columns: 1fr;
