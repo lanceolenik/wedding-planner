@@ -44,9 +44,7 @@ const username = ref('')
 const error = ref('')
 const printingTable = ref(null)
 
-const isProduction = import.meta.env.MODE === 'production'
-const basePath = isProduction ? '/wedding/api' : '/api'
-const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath
+const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + '/api'
 
 const fetchData = async () => {
   try {
