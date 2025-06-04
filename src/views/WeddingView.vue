@@ -58,43 +58,45 @@ export default {
           />
         </transition>
       </div>-->
-      <div class="where shadowed">
-        <h2>Where</h2>
-        <tippy content="<i class='icon wedding-icons icon-map'></i> Get directions">
-          <a class="map" href="https://maps.app.goo.gl/hxu1y68Ne3FrQBV78" target="_blank">
-            <i class="icon wedding-icons icon-location_on" title="The Wedding"></i>
-            <span class="address">
-              <strong>?</strong><br />
-              123 Cool Street<br />Idaho Falls, ID
-            </span>
-            <small>Get Directions</small>
-          </a>
-        </tippy>
-        <figure>
-          <img class="venue" src="@/assets/venue.jpg" alt="Venue" />
-        </figure>
-      </div>
-      <div class="when shadowed">
-        <h2>When</h2>
-        <tippy content="<i class='icon wedding-icons icon-calendar'></i> Add to calendar">
-          <a
-            class="date-time"
-            href="https://stripo.email/storage/ics/2025/3/ics_gracie-michael-wedding-2025-03-18-183846.ics"
-          >
-            <i
-              class="icon wedding-icons icon-Calendar-Heart-Fill--Streamline-Outlined-Fill-Material-Pro-converted"
-              title="The Wedding"
-            ></i>
-            <span class="grid">
-              <strong>Date: </strong><span>?</span> <strong>Start: </strong><span>?</span>
-              <strong>End: </strong><span>?</span>
-            </span>
-            <small>Add to Calendar</small>
-          </a>
-        </tippy>
-        <figure>
-          <img class="venue" src="@/assets/when.jpg" alt="Pocket Watch" />
-        </figure>
+      <div class="wedding-details">
+        <div class="where shadowed">
+          <h2>Where</h2>
+          <tippy content="<i class='icon wedding-icons icon-map'></i> Get directions">
+            <a class="map" href="https://maps.app.goo.gl/hxu1y68Ne3FrQBV78" target="_blank">
+              <i class="icon wedding-icons icon-location_on" title="The Wedding"></i>
+              <span class="address">
+                <strong>?</strong><br />
+                123 Cool Street<br />Idaho Falls, ID
+              </span>
+              <small>Get Directions</small>
+            </a>
+          </tippy>
+          <figure>
+            <img class="venue" src="@/assets/venue.jpg" alt="Venue" />
+          </figure>
+        </div>
+        <div class="when shadowed">
+          <h2>When</h2>
+          <tippy content="<i class='icon wedding-icons icon-calendar'></i> Add to calendar">
+            <a
+              class="date-time"
+              href="https://stripo.email/storage/ics/2025/3/ics_gracie-michael-wedding-2025-03-18-183846.ics"
+            >
+              <i
+                class="icon wedding-icons icon-Calendar-Heart-Fill--Streamline-Outlined-Fill-Material-Pro-converted"
+                title="The Wedding"
+              ></i>
+              <span class="grid">
+                <strong>Date: </strong><span>?</span> <strong>Start: </strong><span>?</span>
+                <strong>End: </strong><span>?</span>
+              </span>
+              <small>Add to Calendar</small>
+            </a>
+          </tippy>
+          <figure>
+            <img class="venue" src="@/assets/when.jpg" alt="Pocket Watch" />
+          </figure>
+        </div>
       </div>
     </div>
   </div>
@@ -148,6 +150,13 @@ export default {
     text-decoration: underline;
     i:before {
       transform: rotate(0deg);
+    }
+  }
+  .wedding-details {
+    display: flex;
+    gap: 20px;
+    @media (max-width: 767px) {
+      flex-direction: column-reverse;
     }
   }
   .where,
