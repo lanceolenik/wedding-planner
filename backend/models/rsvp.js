@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose')
 
 const rsvpSchema = new mongoose.Schema({
   name: String,
@@ -13,4 +13,4 @@ const rsvpSchema = new mongoose.Schema({
 
 const Rsvp = mongoose.model('Rsvp', rsvpSchema)
 
-export { Rsvp }
+module.exports = { Rsvp }

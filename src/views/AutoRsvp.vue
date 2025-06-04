@@ -88,5 +88,3 @@ const clearRSVP = () => {
   }
 }
 </style>
-
-Walmart Online Service Portal:
