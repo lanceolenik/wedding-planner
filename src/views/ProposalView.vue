@@ -4,10 +4,7 @@
       <h1 class="hasHr">The Proposal</h1>
       <div class="shadowed">
         <p>On May 31, 2025, this happened:</p>
-        <SlideShow
-          design-id="DAGpVEevkdo/En8-UX7G5WW9Z7yPMmbqXQ"
-          link-text="Gracie & Michael - The Proposal"
-        />
+        <SlideShow source="local" :src-id="Proposal" link-text="Gracie & Michael - The Proposal" />
       </div>
     </div>
   </div>
@@ -15,6 +12,7 @@
 
 <script setup>
 import SlideShow from '@/components/SlideShow.vue'
+import Proposal from '@/assets/video/proposal.mp4'
 </script>
 
 <style lang="scss" scoped>
