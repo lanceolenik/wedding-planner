@@ -28,6 +28,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
-*.mp4
+src/assets/video/proposal.mp4
 
 *.tsbuildinfo
