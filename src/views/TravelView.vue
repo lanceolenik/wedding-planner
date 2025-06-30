@@ -1,317 +1,68 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 
-// Helper for localStorage with expiration
-const setCacheItem = (key, data, expiresInDays) => {
-  const now = new Date().getTime()
-  const item = {
-    data: data,
-    expiry: now + expiresInDays * 24 * 60 * 60 * 1000, // expiry in milliseconds
-  }
-  localStorage.setItem(key, JSON.stringify(item))
-}
-
-const getCacheItem = (key) => {
-  const itemStr = localStorage.getItem(key)
-  if (!itemStr) {
-    return null // No item found
-  }
-
-  try {
-    const item = JSON.parse(itemStr)
-    const now = new Date().getTime()
-
-    if (now > item.expiry) {
-      localStorage.removeItem(key) // Item expired, remove it
-      console.log(`Cache for ${key} expired and removed.`)
-      return null
-    }
-    return item.data // Return the actual data
-  } catch (e) {
-    console.error(`Error parsing cache item ${key}:`, e)
-    localStorage.removeItem(key) // Clear potentially corrupted item
-    return null
-  }
-}
-
-// Define range of zip codes
-const zipCodes = ['83401', '83402', '83403', '83404', '83405', '83415']
-const isProduction = import.meta.env.MODE === 'production'
-console.log('isProduction', isProduction)
-const basePath = isProduction ? '/wedding/api' : '/api'
-//const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath
-const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5001') + basePath
-const hotels = ref([])
-const parks = ref([])
-const museumsZoos = ref([])
-const otherEntertainment = ref([])
-const error = ref('')
-const isLoading = ref(false)
-const hotelsLoading = ref(false)
-const parksLoading = ref(false)
-const museumsZoosLoading = ref(false)
-const otherEntertainmentLoading = ref(false)
-
-// Fallback coordinates for Idaho Falls
-const fallbackLocation = { lat: 43.4917, lng: -112.033 }
-
-// Geocode a single zip code to lat/lng
-const geocodeZip = async (zip) => {
-  try {
-    const response = await axios.get(`${apiUrl}/google-geocode`, {
-      params: { address: zip },
-    })
-    if (response.data.status !== 'OK' || !response.data.results?.[0]) {
-      throw new Error(
-        `Geocoding failed for ${zip}: ${response.data.status || 'Unknown'}, error: ${response.data.error_message || 'No error message provided'}`,
-      )
-    }
-    return response.data.results[0].geometry.location
-  } catch (err) {
-    console.error('Geocoding error for', zip, ':', {
-      message: err.message,
-      response: err.response?.data,
-      status: err.response?.status,
-      axiosError: err.toJSON?.() || err,
-    })
-    return null
-  }
-}
-
-// Fetch hotels/motels for multiple locations
-const fetchHotels = async (locations) => {
-  hotelsLoading.value = true
-  try {
-    const hotelsCacheKey = `hotels_${zipCodes.join('-')}`
-    const hotelsCachedData = getCacheItem(hotelsCacheKey)
-    if (hotelsCachedData) {
-      hotels.value = hotelsCachedData
-      return
-    }
-
-    const allHotels = []
-    for (const location of locations) {
-      if (location) {
-        const response = await axios.get(`${apiUrl}/google-places/nearbysearch/json`, {
-          params: {
-            location: `${location.lat},${location.lng}`,
-            radius: 20000,
-            type: 'lodging',
-          },
-        })
-        if (response.data.status !== 'OK') {
-          throw new Error(
-            `Hotel fetch failed: ${response.data.status}, error: ${response.data.error_message || 'Unknown'}`,
-          )
-        }
-        allHotels.push(...(response.data.results || []))
-      }
-    }
-    const uniqueHotels = Array.from(
-      new Map(allHotels.map((item) => [item.place_id, item])).values(),
-    )
-    const filteredHotels = uniqueHotels
-      .filter((place) => place.rating >= 3.5)
-      .slice(0, 5)
-      .map((place) => ({
-        name: place.name,
-        address: place.vicinity,
-        rating: place.rating,
-        website:
-          place.website ||
-          `https://www.google.com/search?q=${encodeURIComponent(place.name + ' Idaho Falls')}`,
-      }))
-    hotels.value = filteredHotels
-    setCacheItem(hotelsCacheKey, filteredHotels, 7)
-  } catch (err) {
-    console.error('Hotels fetch error:', {
-      message: err.message,
-      response: err.response?.data,
-      status: err.response?.status,
-      axiosError: err.toJSON?.() || err,
-    })
-    error.value = 'Failed to load accommodations. Please try again later.'
-  } finally {
-    hotelsLoading.value = false
-  }
-}
-
-// Fetch entertainment options for multiple locations
-const fetchEntertainment = async (locations) => {
-  parksLoading.value = true
-  museumsZoosLoading.value = true
-  otherEntertainmentLoading.value = true
-  try {
-    const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
-    const entertainmentCachedData = getCacheItem(entertainmentCacheKey)
-    if (entertainmentCachedData) {
-      const {
-        parks: cachedParks,
-        museumsZoos: cachedMuseumsZoos,
-        otherEntertainment: cachedOtherEntertainment,
-      } = entertainmentCachedData
-      parks.value = cachedParks
-      museumsZoos.value = cachedMuseumsZoos
-      otherEntertainment.value = cachedOtherEntertainment
-      parksLoading.value = false
-      museumsZoosLoading.value = false
-      otherEntertainmentLoading.value = false
-      return
-    }
-
-    const parkTypes = ['park']
-    const museumZooTypes = ['museum', 'zoo']
-    const otherTypes = ['theater', 'bowling_alley']
-
-    const filterPlaces = (place) => {
-      const excludedTypes = [
-        'bar',
-        'night_club',
-        'casino',
-        'lodging',
-        'political',
-        'store',
-        'laundry',
-        'airport',
-        'veterinary_care',
-      ]
-      return !place.types.some((type) => excludedTypes.includes(type)) && place.rating >= 3.5
-    }
-
-    const fetchCategory = async (typeArray, categoryArray) => {
-      const allResults = []
-      for (const location of locations) {
-        if (location) {
-          for (const type of typeArray) {
-            const response = await axios.get(`${apiUrl}/google-places/nearbysearch/json`, {
-              params: {
-                location: `${location.lat},${location.lng}`,
-                radius: 20000,
-                type,
-              },
-            })
-            if (response.data.status !== 'OK') {
-              console.warn(
-                `${type} fetch warning: ${response.data.status}, error: ${response.data.error_message || 'Unknown'}`,
-              )
-              continue
-            }
-            allResults.push(...(response.data.results || []).filter(filterPlaces))
-          }
-        }
-      }
-      const uniqueResults = Array.from(
-        new Map(allResults.map((item) => [item.place_id, item])).values(),
-      )
-      return uniqueResults.slice(0, 3).map((place) => ({
-        name: place.name,
-        address: place.vicinity,
-        rating: place.rating,
-        website:
-          place.website ||
-          `https://www.google.com/search?q=${encodeURIComponent(place.name + ' Idaho Falls')}`,
-      }))
-    }
-
-    const fetchedParks = await fetchCategory(parkTypes, parks.value)
-    const fetchedMuseumsZoos = await fetchCategory(museumZooTypes, museumsZoos.value)
-    const fetchedOtherEntertainment = await fetchCategory(otherTypes, otherEntertainment.value)
-
-    parks.value = fetchedParks
-    museumsZoos.value = fetchedMuseumsZoos
-    otherEntertainment.value = fetchedOtherEntertainment
-
-    setCacheItem(
-      entertainmentCacheKey,
-      {
-        parks: fetchedParks,
-        museumsZoos: fetchedMuseumsZoos,
-        otherEntertainment: fetchedOtherEntertainment,
-      },
-      7,
-    )
-  } catch (err) {
-    console.error('Entertainment fetch error:', {
-      message: err.message,
-      response: err.response?.data,
-      status: err.response?.status,
-      axiosError: err.toJSON?.() || err,
-    })
-    error.value = 'Failed to load entertainment options. Please try again later.'
-  } finally {
-    parksLoading.value = false
-    museumsZoosLoading.value = false
-    otherEntertainmentLoading.value = false
-  }
-}
-
-// Initialize data fetching
-onMounted(async () => {
-  isLoading.value = true
-
-  const hotelsCacheKey = `hotels_${zipCodes.join('-')}`
-  const entertainmentCacheKey = `entertainment_${zipCodes.join('-')}`
-
-  const hotelCachedData = getCacheItem(hotelsCacheKey)
-  if (hotelCachedData) {
-    hotels.value = hotelCachedData
-    hotelsLoading.value = false
-  }
-
-  const entertainmentCachedData = getCacheItem(entertainmentCacheKey)
-  if (entertainmentCachedData) {
-    const {
-      parks: cachedParks,
-      museumsZoos: cachedMuseumsZoos,
-      otherEntertainment: cachedOtherEntertainment,
-    } = entertainmentCachedData
-    parks.value = cachedParks
-    museumsZoos.value = cachedMuseumsZoos
-    otherEntertainment.value = cachedOtherEntertainment
-    parksLoading.value = false
-    museumsZoosLoading.value = false
-    otherEntertainmentLoading.value = false
-  }
-
-  if (!hotelCachedData || !entertainmentCachedData) {
-    const locations = await Promise.all(zipCodes.map((zip) => geocodeZip(zip)))
-    const validLocations = locations.filter((loc) => loc !== null)
-    if (validLocations.length === 0) {
-      validLocations.push(fallbackLocation)
-    }
-
-    const promisesToRun = []
-    if (!hotelCachedData) {
-      promisesToRun.push(fetchHotels(validLocations))
-    }
-    if (!entertainmentCachedData) {
-      promisesToRun.push(fetchEntertainment(validLocations))
-    }
-
-    await Promise.all(promisesToRun)
-  }
-  isLoading.value = false
-})
+const hotels = ref([
+  {
+    name: 'Hotel 1',
+    website: 'website 1',
+    rating: 4,
+    address: '123 Sesame St.',
+  },
+  {
+    name: 'Hotel 2',
+    website: 'website 2',
+    rating: 4,
+    address: '456 Sesame St.',
+  },
+])
+const parks = ref([
+  {
+    name: 'Park 1',
+    website: 'website 1',
+    rating: 4,
+    address: '123 Sesame St.',
+  },
+  {
+    name: 'Park 2',
+    website: 'website 2',
+    rating: 4,
+    address: '456 Sesame St.',
+  },
+])
+const museumsZoos = ref([
+  {
+    name: 'Zoo 1',
+    website: 'website 1',
+    rating: 4,
+    address: '123 Sesame St.',
+  },
+  {
+    name: 'Museum 2',
+    website: 'website 2',
+    rating: 4,
+    address: '456 Sesame St.',
+  },
+])
+const otherEntertainment = ref([
+  {
+    name: 'Ent 1',
+    website: 'website 1',
+    rating: 4,
+    address: '123 Sesame St.',
+  },
+  {
+    name: 'Ent 2',
+    website: 'website 2',
+    rating: 4,
+    address: '456 Sesame St.',
+  },
+])
 </script>
 
 <template>
   <div class="travel">
     <div class="container">
       <h1 class="hasHr">Travel Information</h1>
-      <p v-if="isLoading" class="loading">
-        <i
-          v-if="isLoading"
-          class="loading-icon icon-loading-flower"
-          title="Loading travel info..."
-        ></i>
-        Loading travel information...
-      </p>
-      <p class="center">
-        Note: Much of the information here is auto-generated. We do not necessarily endorse any of
-        these establishments.
-      </p>
-      <p v-if="error && !isLoading" class="error">{{ error }}</p>
       <div class="flex">
         <div class="type shadowed">
           <h2>Airports</h2>
@@ -326,11 +77,6 @@ onMounted(async () => {
           <div>
             <p>These accommodations are near the wedding venue:</p>
             <h3>Hotels/Motels</h3>
-            <i
-              v-if="hotelsLoading"
-              class="loading-icon icon-loading-flower"
-              title="Loading hotels/motels..."
-            ></i>
             <ul>
               <li v-for="hotel in hotels" :key="hotel.name">
                 <a :href="hotel.website" target="_blank">
@@ -338,7 +84,6 @@ onMounted(async () => {
                 </a>
                 <small>{{ hotel.address }}</small>
               </li>
-              <li v-if="hotels.length === 0 && !isLoading">No hotels found.</li>
             </ul>
             <h3>Short-term rentals</h3>
             <p>Please check out these websites to search for short-term rentals:</p>
@@ -376,17 +121,11 @@ onMounted(async () => {
           <p>Family-friendly activities near the wedding venue:</p>
 
           <h3>Parks</h3>
-          <i
-            v-if="parksLoading"
-            class="loading-icon icon-loading-flower"
-            title="Loading parks..."
-          ></i>
           <ul>
             <li v-for="item in parks" :key="item.name">
               <a :href="item.website" target="_blank"> {{ item.name }} ({{ item.rating }}★) </a>
               <small>{{ item.address }}</small>
             </li>
-            <li v-if="parks.length === 0 && !isLoading">No parks found.</li>
           </ul>
 
           <h3>Museums & Zoos</h3>
@@ -404,18 +143,10 @@ onMounted(async () => {
           </ul>
 
           <h3>Other Entertainment</h3>
-          <i
-            v-if="otherEntertainmentLoading"
-            class="loading-icon icon-loading-flower"
-            title="Loading entertainment..."
-          ></i>
           <ul>
             <li v-for="item in otherEntertainment" :key="item.name">
               <a :href="item.website" target="_blank"> {{ item.name }} ({{ item.rating }}★) </a>
               <small>{{ item.address }}</small>
-            </li>
-            <li v-if="otherEntertainment.length === 0 && !isLoading">
-              No other entertainment options found.
             </li>
           </ul>
           <h3>More</h3>

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?ds8qar');
-  src:  url('fonts/icomoon.eot?ds8qar#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?ds8qar') format('truetype'),
-    url('fonts/icomoon.woff?ds8qar') format('woff'),
-    url('fonts/icomoon.svg?ds8qar#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?5mxoqp');
+  src:  url('fonts/icomoon.eot?5mxoqp#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?5mxoqp') format('truetype'),
+    url('fonts/icomoon.woff?5mxoqp') format('woff'),
+    url('fonts/icomoon.svg?5mxoqp#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -246,4 +246,10 @@
 }
 .icon-snapchat:before {
   content: "\e940";
+}
+.icon-sun:before {
+  content: "\e943";
+}
+.icon-moon:before {
+  content: "\e944";
 }
