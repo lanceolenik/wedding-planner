@@ -34,7 +34,9 @@ h1 {
   width: 100%;
   text-align: center;
   &.hasHr {
+    padding-top: 20px;
     margin-bottom: 30px;
+    line-height: 1.2;
     &:before,
     &:after {
       content: '';

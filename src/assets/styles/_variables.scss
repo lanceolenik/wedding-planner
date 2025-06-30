@@ -38,7 +38,8 @@
 
 /* semantic color variables for this project */
 /* prefers-color-scheme: default/light */
-:root {
+:root,
+body.light-mode {
   --color-background: var(--vt-c-white);
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
@@ -60,8 +61,30 @@
   --color-green-opaque: hsl(from var(--vt-c-green-light) h s l / 25%);
 }
 
+body.dark-mode {
+  --color-background: var(--vt-c-black);
+  --color-background-soft: var(--vt-c-black-soft);
+  --color-background-mute: var(--vt-c-black-mute);
+
+  --color-border: var(--vt-c-divider-dark-2);
+  --color-border-hover: var(--vt-c-divider-dark-1);
+
+  --color-heading: var(--vt-c-white-soft);
+  --color-text: var(--vt-c-white-soft);
+  --color-link: var(--vt-c-white-mute);
+  --color-link-hover: var(--vt-c-black-mute);
+
+  --color-nav: var(--vt-c-white-soft);
+  --color-nav-hover: var(--vt-c-white-mute);
+  --color-nav-active: var(--vt-c-white-soft);
+  --color-background-blend: hsl(from var(--vt-c-black) h s l / 85%);
+  --color-background-opaque: hsl(from var(--vt-c-black) h s l / 85%);
+
+  --color-green-opaque: hsl(from var(--vt-c-green-dark) h s l / 25%);
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light-mode):not(.dark-mode) {
     --color-background: var(--vt-c-black);
     --color-background-soft: var(--vt-c-black-soft);
     --color-background-mute: var(--vt-c-black-mute);

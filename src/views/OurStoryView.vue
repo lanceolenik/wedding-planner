@@ -4,7 +4,7 @@
       <h1 class="hasHr">Our Story</h1>
       <div class="shadowed">
         <h2>Coming Soon</h2>
-        <p>...</p>
+        <!--<p>...</p>
         <h2>A Visual Story</h2>
         <SlideShow
           source="canva"
@@ -16,7 +16,7 @@
           source="canva"
           src-id="DAGpVEevkdo/37m-gC4p7pXf1BxjbVuUVA"
           link-text="Gracie & Michael - The Proposal"
-        />
+        />-->
       </div>
     </div>
   </div>

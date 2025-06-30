@@ -2,6 +2,7 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { useRoute } from 'vue-router'
 import { computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import DarkLightToggle from '@/components/DarkLightToggle.vue'
 import Footer from '@/components/Footer.vue'
 
 // Get the current route
@@ -82,6 +83,7 @@ onBeforeUnmount(() => {
           <span class="nav-label">Contact<span class="hide-on-mobile"> Us</span></span>
         </RouterLink>
       </nav>
+      <DarkLightToggle />
     </header>
     <main>
       <RouterView v-slot="{ Component }">

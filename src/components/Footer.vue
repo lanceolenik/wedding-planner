@@ -19,10 +19,11 @@
   font-size: 14px;
   padding: 50px 3px 10px;
   text-align: right;
+  color: var(--color-link);
   z-index: 1;
   a {
     text-decoration: none;
-    color: inherit;
+    color: var(--color-link);
     &:hover {
       text-decoration: underline;
     }
